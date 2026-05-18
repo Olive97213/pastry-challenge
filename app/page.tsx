@@ -1,19 +1,40 @@
-import { Button } from "@/components/ui/button"
+import { BookOpen } from "lucide-react"
+import { PastryCardList, type Pastry } from "@/components/pastry-card-list"
+import { getMeals } from "@/services/mealServices"
 
-export default function Page() {
+export default async function Home() {
+  const meals = await getMeals()
+
+  const pastries: Pastry[] = [
+    ...meals.map((meal) => ({
+      id: meal.idMeal,
+      imageSrc: meal.strMealThumb,
+      title: meal.strMeal,
+      imageAlt: meal.strMeal,
+    })),
+  ]
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
+    <div className="min-h-screen bg-background">
+      <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+            <BookOpen className="h-8 w-8 text-muted-foreground" />
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Bienvenue sur RecetteBook
+          </h1>
+          <p className="max-w-md text-muted-foreground">
+            Gérez et partagez vos recettes préférées. Commencez par ajouter
+            votre première recette !
+          </p>
+        </div>
         <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
+          <h2 className="mb-8 text-center text-3xl font-bold text-foreground">
+            Nos Pâtisseries
+          </h2>
+          <PastryCardList pastries={pastries} />
         </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          (Press <kbd>d</kbd> to toggle dark mode)
-        </div>
-      </div>
+      </main>
     </div>
   )
 }
