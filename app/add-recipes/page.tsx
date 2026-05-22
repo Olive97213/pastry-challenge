@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/form"
 import { useState } from "react"
 import { Recipe } from "@/lib/types"
+import { addRecipesAction } from "./action"
 
 export default function AddRecipesForm() {
   const form = useForm<FormSchemaType>({
@@ -34,17 +35,22 @@ export default function AddRecipesForm() {
   })
   const [recipes, setRecipes] = useState<Recipe[]>([])
 
-  function onSubmit(data: FormSchemaType) {
-    // Ici, vous pouvez envoyer les données au backend ou les stocker localement
-    console.log("Recette ajoutée:", data)
-    toast.success("Recette ajoutée !", {
-      description: `La recette "${data.name}" a été ajoutée avec succès !`,
-    })
+  async function onSubmit(data: FormSchemaType) {
     const newRecipe = {
       ...data,
-      id: String(recipes.length + 1),
       createdAt: new Date(),
     }
+    // Ici, vous pouvez envoyer les données au backend ou les stocker localement
+    try {
+      await addRecipesAction(newRecipe) // Appel de l'action pour ajouter la recette
+      toast.success("Recette ajoutée !", {
+        description: `La recette "${data.name}" a été ajoutée avec succès !`,
+      })
+    } catch (error) {
+      console.error("Failed to add recipe", error)
+      toast.error("Erreur lors de l'ajout de la recette")
+    }
+
     setRecipes([...recipes, newRecipe])
     form.reset() // Réinitialiser le formulaire après soumission
   }

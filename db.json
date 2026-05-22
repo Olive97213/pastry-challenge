@@ -1,0 +1,34 @@
+{
+  "recipes": [
+    {
+      "id": "1",
+      "name": "Default recipe",
+      "description": "A simple default recipe",
+      "ingredients": "Flour, sugar, eggs",
+      "instructions": "Mix all ingredients and bake at 180°C for 30 minutes.",
+      "prepTime": "30",
+      "servings": "4",
+      "createdAt": "2026-05-22T15:37:05.386Z"
+    },
+    {
+      "name": "okfodkfbo",
+      "description": "okokopkjo",
+      "ingredients": "ofjifjv",
+      "instructions": "ijfodjfiv",
+      "prepTime": "45min",
+      "servings": "3",
+      "createdAt": "2026-05-22T15:37:05.371Z",
+      "id": "2"
+    },
+    {
+      "name": "jjnjnj",
+      "description": "jbjbhbhb",
+      "ingredients": "njnjnjn",
+      "instructions": "njnjnj",
+      "prepTime": "34min",
+      "servings": "4",
+      "createdAt": "2026-05-22T15:55:32.818Z",
+      "id": "3"
+    }
+  ]
+}
