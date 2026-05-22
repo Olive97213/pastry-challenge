@@ -4,9 +4,10 @@ import { getMeals } from "@/services/mealServices"
 
 export default async function Home() {
   const meals = await getMeals()
+  const filteredMeals = meals.slice(0, 8) // Limiter à 8 pâtisseries pour l'affichage
 
   const pastries: Pastry[] = [
-    ...meals.map((meal) => ({
+    ...filteredMeals.map((meal) => ({
       id: meal.idMeal,
       imageSrc: meal.strMealThumb,
       title: meal.strMeal,

@@ -1,3 +1,5 @@
+import { FormSchemaType } from "@/app/add-recipes/schema"
+
 export interface Pastry {
   id: string
   imageSrc: string
@@ -9,4 +11,9 @@ export interface Pastry {
   idMeal: string
   strMeal: string
   strMealThumb: string
+}
+
+export type Recipe = FormSchemaType & {
+  id: string
+  createdAt: Date
 }

@@ -1,66 +1,56 @@
 "use client"
 
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PlusCircle, Clock, Users, Trash2, UtensilsCrossed } from "lucide-react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { formSchema, FormSchemaType } from "./schema"
+import { toast } from "sonner"
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Form,
+} from "@/components/ui/form"
+import { useState } from "react"
+import { Recipe } from "@/lib/types"
 
-interface Recipe {
-  id: string
-  name: string
-  description: string
-  ingredients: string
-  instructions: string
-  prepTime: string
-  servings: string
-  createdAt: Date
-}
-
-export default function AddRecipePage() {
-  const [recipes, setRecipes] = useState<Recipe[]>([])
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    ingredients: "",
-    instructions: "",
-    prepTime: "",
-    servings: "",
-  })
-
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!formData.name.trim()) return
-
-    const newRecipe: Recipe = {
-      id: Date.now().toString(),
-      ...formData,
-      createdAt: new Date(),
-    }
-
-    setRecipes((prev) => [newRecipe, ...prev])
-    setFormData({
+export default function AddRecipesForm() {
+  const form = useForm<FormSchemaType>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
       name: "",
       description: "",
       ingredients: "",
       instructions: "",
       prepTime: "",
       servings: "",
+    },
+  })
+  const [recipes, setRecipes] = useState<Recipe[]>([])
+
+  function onSubmit(data: FormSchemaType) {
+    // Ici, vous pouvez envoyer les données au backend ou les stocker localement
+    console.log("Recette ajoutée:", data)
+    toast.success("Recette ajoutée !", {
+      description: `La recette "${data.name}" a été ajoutée avec succès !`,
     })
+    const newRecipe = {
+      ...data,
+      id: String(recipes.length + 1),
+      createdAt: new Date(),
+    }
+    setRecipes([...recipes, newRecipe])
+    form.reset() // Réinitialiser le formulaire après soumission
   }
 
-  const deleteRecipe = (id: string) => {
-    setRecipes((prev) => prev.filter((recipe) => recipe.id !== id))
+  function deleteRecipe(id: string): void {
+    setRecipes(recipes.filter((recipe) => recipe.id !== id))
   }
 
   return (
@@ -75,92 +65,124 @@ export default function AddRecipePage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="name">Nom de la recette *</Label>
-                <Input
-                  id="name"
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6"
+              >
+                <FormField
+                  control={form.control}
                   name="name"
-                  placeholder="Ex: Tarte aux pommes"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel>Nom de la recette</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ex: Tarte aux pommes" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
+                <FormField
+                  control={form.control}
                   name="description"
-                  placeholder="Une brève description de votre recette..."
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  rows={2}
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Une brève description de votre recette..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="prepTime">Temps de préparation</Label>
-                  <div className="relative">
-                    <Clock className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      id="prepTime"
-                      name="prepTime"
-                      placeholder="Ex: 45 minutes"
-                      value={formData.prepTime}
-                      onChange={handleInputChange}
-                      className="pl-10"
-                    />
-                  </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="prepTime"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel>Temps de préparation</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Clock className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                            <Input
+                              className="pl-10"
+                              placeholder="Ex: 45 minutes"
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="servings"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel>Nombre de personnes</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Users className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                            <Input
+                              className="pl-10"
+                              placeholder="Ex: 4 personnes"
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="servings">Nombre de personnes</Label>
-                  <div className="relative">
-                    <Users className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      id="servings"
-                      name="servings"
-                      placeholder="Ex: 4 personnes"
-                      value={formData.servings}
-                      onChange={handleInputChange}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="ingredients">Ingrédients</Label>
-                <Textarea
-                  id="ingredients"
+                <FormField
+                  control={form.control}
                   name="ingredients"
-                  placeholder="Listez vos ingrédients (un par ligne)..."
-                  value={formData.ingredients}
-                  onChange={handleInputChange}
-                  rows={4}
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel>Ingrédients</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Listez vos ingrédients (un par ligne)..."
+                          {...field}
+                          rows={4}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="instructions">Instructions</Label>
-                <Textarea
-                  id="instructions"
+                <FormField
+                  control={form.control}
                   name="instructions"
-                  placeholder="Décrivez les étapes de préparation..."
-                  value={formData.instructions}
-                  onChange={handleInputChange}
-                  rows={5}
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel>Instructions</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Décrivez les étapes de préparation..."
+                          {...field}
+                          rows={5}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <Button type="submit" className="w-full sm:w-auto">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Ajouter la recette
-              </Button>
-            </form>
+                <Button type="submit" className="w-full sm:w-auto">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Ajouter la recette
+                </Button>
+              </form>
+            </Form>
           </CardContent>
         </Card>
 
