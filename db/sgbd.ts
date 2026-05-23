@@ -54,4 +54,27 @@ export async function addRecipes(recipe: Omit<Recipe, 'id'>) {
 
   })
 }
-     
+
+export async function deleteRecipes(id: string) {
+  const db = await lowDb()
+  await db.update(({recipes}) => {
+    if (recipes) {
+      const index = recipes.findIndex((recipe) => recipe.id === id)
+      if (index !== -1) {
+        recipes.splice(index, 1)
+      }
+    }
+  })
+} 
+    
+export async function updateRecipes(id: string, updatedRecipe: Omit<Recipe, 'id'>) {
+  const db = await lowDb()
+  await db.update(({recipes}) => {
+    if (recipes) {
+      const index = recipes.findIndex((recipe) => recipe.id === id)
+      if (index !== -1) {
+        recipes[index] = { ...updatedRecipe, id }
+      }
+    }
+  })
+}   

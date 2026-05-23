@@ -1,34 +1,24 @@
 {
   "recipes": [
     {
-      "id": "1",
-      "name": "Default recipe",
+      "name": "Crepe",
       "description": "A simple default recipe",
       "ingredients": "Flour, sugar, eggs",
       "instructions": "Mix all ingredients and bake at 180°C for 30 minutes.",
       "prepTime": "30",
       "servings": "4",
-      "createdAt": "2026-05-22T15:56:35.389Z"
+      "createdAt": "2026-05-23T16:17:25.291Z",
+      "id": "1"
     },
     {
-      "name": "jvijdfidfji",
-      "description": "njnjnj",
-      "ingredients": "njnjnjn",
-      "instructions": "jnjnj",
-      "prepTime": "34min",
-      "servings": "4",
-      "createdAt": "2026-05-22T15:56:35.378Z",
+      "name": "Fraisier5",
+      "description": "knjnjn",
+      "ingredients": "kfvkf,vk",
+      "instructions": "jvfjifdjvi",
+      "prepTime": "3h",
+      "servings": "5",
+      "createdAt": "2026-05-23T16:03:40.876Z",
       "id": "2"
-    },
-    {
-      "name": "tarte aux noix",
-      "description": "rjijrirjoi",
-      "ingredients": "jvjdfvjfhvfdu",
-      "instructions": "vidjvifdvjdfivj",
-      "prepTime": "4h",
-      "servings": "4",
-      "createdAt": "2026-05-22T16:00:54.173Z",
-      "id": "3"
     }
   ]
 }

@@ -4,7 +4,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { PlusCircle, Clock, Users, Trash2, UtensilsCrossed } from "lucide-react"
+import {
+  PlusCircle,
+  Clock,
+  Users,
+  Trash2,
+  UtensilsCrossed,
+  Pencil,
+} from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { formSchema, FormSchemaType } from "./schema"
@@ -17,9 +24,14 @@ import {
   FormMessage,
   Form,
 } from "@/components/ui/form"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Recipe } from "@/lib/types"
-import { addRecipesAction } from "./action"
+import {
+  addRecipesAction,
+  deleteRecipesAction,
+  updateRecipesAction,
+} from "./action"
+import { getRecipesAction } from "./action"
 
 export default function AddRecipesForm() {
   const form = useForm<FormSchemaType>({
@@ -34,29 +46,56 @@ export default function AddRecipesForm() {
     },
   })
   const [recipes, setRecipes] = useState<Recipe[]>([])
+  const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null)
+
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      const recipes = await getRecipesAction()
+      setRecipes(recipes ?? [])
+    }
+    fetchRecipes()
+  }, [])
 
   async function onSubmit(data: FormSchemaType) {
     const newRecipe = {
       ...data,
       createdAt: new Date(),
+      id: crypto.randomUUID(),
     }
-    // Ici, vous pouvez envoyer les données au backend ou les stocker localement
-    try {
-      await addRecipesAction(newRecipe) // Appel de l'action pour ajouter la recette
+    if (editingRecipe) {
+      await updateRecipesAction(editingRecipe.id, newRecipe)
+      setEditingRecipe(null)
+      toast.success("Recette mise à jour !")
+    } else {
+      // Mode ajout
+      await addRecipesAction(newRecipe)
       toast.success("Recette ajoutée !", {
         description: `La recette "${data.name}" a été ajoutée avec succès !`,
       })
-    } catch (error) {
-      console.error("Failed to add recipe", error)
-      toast.error("Erreur lors de l'ajout de la recette")
     }
-
-    setRecipes([...recipes, newRecipe])
-    form.reset() // Réinitialiser le formulaire après soumission
+    const updatedRecipes = await getRecipesAction()
+    setRecipes(updatedRecipes ?? [])
+    form.reset({
+      name: "",
+      description: "",
+      ingredients: "",
+      instructions: "",
+      prepTime: "",
+      servings: "",
+    }) // Réinitialiser le formulaire après soumission
   }
 
-  function deleteRecipe(id: string): void {
+  function handleEdit(recipe: Recipe) {
+    setEditingRecipe(recipe)
+    form.reset(recipe) // Remplir le formulaire avec les données de la recette à éditer
+  }
+
+  async function deleteRecipe(id: string): Promise<void> {
+    await deleteRecipesAction(id)
     setRecipes(recipes.filter((recipe) => recipe.id !== id))
+    toast.success("Recette supprimée !", {
+      description: `La recette a été supprimée avec succès !`,
+    })
   }
 
   return (
@@ -228,15 +267,26 @@ export default function AddRecipesForm() {
                           <h3 className="text-lg font-semibold">
                             {recipe.name}
                           </h3>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => deleteRecipe(recipe.id)}
-                            className="shrink-0 text-muted-foreground hover:text-destructive"
-                            aria-label="Supprimer la recette"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="shrink-0 text-muted-foreground hover:text-primary"
+                              aria-label="Modifier la recette"
+                              onClick={() => handleEdit(recipe)}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => deleteRecipe(recipe.id)}
+                              className="shrink-0 text-muted-foreground hover:text-destructive"
+                              aria-label="Supprimer la recette"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
 
                         {recipe.description && (
