@@ -24,7 +24,7 @@ import {
   FormMessage,
   Form,
 } from "@/components/ui/form"
-import { useEffect, useState } from "react"
+import { startTransition, useEffect, useOptimistic, useState } from "react"
 import { Recipe } from "@/lib/types"
 import {
   addRecipesAction,
@@ -32,6 +32,7 @@ import {
   updateRecipesAction,
 } from "./action"
 import { getRecipesAction } from "./action"
+import { start } from "node:repl"
 
 export default function AddRecipesForm() {
   const form = useForm<FormSchemaType>({
@@ -47,6 +48,10 @@ export default function AddRecipesForm() {
   })
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null)
+  const [optimisticRecipes, addOptimisticRecipes] = useOptimistic(
+    recipes,
+    (state, newRecipe: Recipe) => [...state, newRecipe]
+  )
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -62,17 +67,28 @@ export default function AddRecipesForm() {
       createdAt: new Date(),
       id: crypto.randomUUID(),
     }
-    if (editingRecipe) {
-      await updateRecipesAction(editingRecipe.id, newRecipe)
-      setEditingRecipe(null)
-      toast.success("Recette mise à jour !")
-    } else {
-      // Mode ajout
-      await addRecipesAction(newRecipe)
-      toast.success("Recette ajoutée !", {
-        description: `La recette "${data.name}" a été ajoutée avec succès !`,
-      })
-    }
+    startTransition(async () => {
+      addOptimisticRecipes(newRecipe) // Ajouter la recette de manière optimiste
+      if (editingRecipe) {
+        const result = await updateRecipesAction(editingRecipe.id, newRecipe)
+        if (!result.success) {
+          toast.error(result.message ?? "Une erreur est survenue")
+          return
+        }
+        toast.success("Recette mise à jour !")
+      } else {
+        //message d'erreur si l'ajout a échoué server
+        const result = await addRecipesAction(newRecipe)
+        if (!result.success) {
+          toast.error(result.message ?? "Une erreur est survenue")
+          return
+        }
+        toast.success("Recette ajoutée !", {
+          description: `La recette "${data.name}" a été ajoutée avec succès !`,
+        })
+      }
+    })
+
     const updatedRecipes = await getRecipesAction()
     setRecipes(updatedRecipes ?? [])
     form.reset({
@@ -255,7 +271,7 @@ export default function AddRecipesForm() {
             </Card>
           ) : (
             <div className="space-y-4">
-              {recipes.map((recipe) => (
+              {optimisticRecipes.map((recipe) => (
                 <Card
                   key={recipe.id}
                   className="overflow-hidden transition-shadow hover:shadow-md"

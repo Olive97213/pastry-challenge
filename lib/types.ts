@@ -17,3 +17,17 @@ export type Recipe = FormSchemaType & {
   id: string
   createdAt: Date
 }
+
+export type ValidationError = {
+  field: keyof FormSchemaType
+  message: string
+}
+
+export type RecipeOptimistic = Recipe & {
+    sending?: boolean
+}
+
+export type OptimisticField = {
+    isCompleted: boolean; 
+    sending: boolean;
+}

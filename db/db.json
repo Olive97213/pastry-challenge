@@ -1,23 +1,23 @@
 {
   "recipes": [
     {
-      "name": "Crepe",
+      "id": "1",
+      "name": "Default recipe",
       "description": "A simple default recipe",
       "ingredients": "Flour, sugar, eggs",
       "instructions": "Mix all ingredients and bake at 180°C for 30 minutes.",
       "prepTime": "30",
       "servings": "4",
-      "createdAt": "2026-05-23T16:17:25.291Z",
-      "id": "1"
+      "createdAt": "2026-05-28T16:45:08.958Z"
     },
     {
-      "name": "Fraisier5",
-      "description": "knjnjn",
-      "ingredients": "kfvkf,vk",
-      "instructions": "jvfjifdjvi",
-      "prepTime": "3h",
-      "servings": "5",
-      "createdAt": "2026-05-23T16:03:40.876Z",
+      "name": "Fraisier",
+      "description": "Délicieux entremet aux fraises",
+      "ingredients": "Fraises\nGénoises\nCreme mousseline vanille",
+      "instructions": "jfijfijdfojd",
+      "prepTime": "6h",
+      "servings": "8",
+      "createdAt": "2026-05-28T16:48:25.136Z",
       "id": "2"
     }
   ]
