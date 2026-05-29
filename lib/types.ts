@@ -27,7 +27,4 @@ export type RecipeOptimistic = Recipe & {
     sending?: boolean
 }
 
-export type OptimisticField = {
-    isCompleted: boolean; 
-    sending: boolean;
-}
+export type OptimisticField = Recipe & { sending: boolean }

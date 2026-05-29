@@ -1,24 +1,44 @@
 {
   "recipes": [
     {
-      "id": "1",
       "name": "Default recipe",
       "description": "A simple default recipe",
       "ingredients": "Flour, sugar, eggs",
       "instructions": "Mix all ingredients and bake at 180°C for 30 minutes.",
       "prepTime": "30",
       "servings": "4",
-      "createdAt": "2026-05-28T16:45:08.958Z"
+      "createdAt": "2026-05-29T14:30:33.033Z",
+      "id": "1"
     },
     {
-      "name": "Fraisier",
-      "description": "Délicieux entremet aux fraises",
-      "ingredients": "Fraises\nGénoises\nCreme mousseline vanille",
-      "instructions": "jfijfijdfojd",
-      "prepTime": "6h",
-      "servings": "8",
-      "createdAt": "2026-05-28T16:48:25.136Z",
+      "name": "spéciale",
+      "description": "okfobkdfo",
+      "ingredients": "lklk",
+      "instructions": "lk",
+      "prepTime": "kolk",
+      "servings": "lklok",
+      "createdAt": "2026-05-29T14:52:54.109Z",
       "id": "2"
+    },
+    {
+      "name": "lkk",
+      "description": "kk,jkj,",
+      "ingredients": ",k,",
+      "instructions": "k,k,",
+      "prepTime": "k,k,",
+      "servings": "k,kk",
+      "createdAt": "2026-05-29T14:56:52.650Z",
+      "id": "3"
+    },
+    {
+      "name": "pklk",
+      "description": "lkll",
+      "ingredients": "kkl",
+      "instructions": "lklk",
+      "prepTime": "k",
+      "servings": "lkl",
+      "createdAt": "2026-05-29T14:57:04.266Z",
+      "id": "4"
     }
   ]
 }

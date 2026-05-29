@@ -39,6 +39,7 @@ export const addRecipesAction = async (
 
   // 2. Si validation OK → on essaie d'ajouter en BDD
   try {
+    await new Promise((resolve) => setTimeout(resolve, 6000))
     await addRecipesDao(recipe)
     return { success: true, message: "Recette ajoutée" } // succès
   } catch (error) {

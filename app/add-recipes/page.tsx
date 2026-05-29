@@ -24,15 +24,22 @@ import {
   FormMessage,
   Form,
 } from "@/components/ui/form"
-import { startTransition, useEffect, useOptimistic, useState } from "react"
-import { Recipe } from "@/lib/types"
+import {
+  startTransition,
+  useEffect,
+  useOptimistic,
+  useState,
+  useRef,
+} from "react"
+import { OptimisticField, Recipe, RecipeOptimistic } from "@/lib/types"
 import {
   addRecipesAction,
   deleteRecipesAction,
   updateRecipesAction,
 } from "./action"
 import { getRecipesAction } from "./action"
-import { start } from "node:repl"
+
+import { cn } from "@/lib/utils"
 
 export default function AddRecipesForm() {
   const form = useForm<FormSchemaType>({
@@ -48,10 +55,12 @@ export default function AddRecipesForm() {
   })
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null)
-  const [optimisticRecipes, addOptimisticRecipes] = useOptimistic(
-    recipes,
-    (state, newRecipe: Recipe) => [...state, newRecipe]
-  )
+  const [optimisticRecipes, addOptimisticRecipes] = useOptimistic<
+    RecipeOptimistic[],
+    OptimisticField
+  >(recipes, (state, optimisticValue) => [...state, optimisticValue])
+  const formRef = useRef<HTMLDivElement>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -62,35 +71,66 @@ export default function AddRecipesForm() {
   }, [])
 
   async function onSubmit(data: FormSchemaType) {
-    const newRecipe = {
-      ...data,
-      createdAt: new Date(),
-      id: crypto.randomUUID(),
-    }
-    startTransition(async () => {
-      addOptimisticRecipes(newRecipe) // Ajouter la recette de manière optimiste
-      if (editingRecipe) {
-        const result = await updateRecipesAction(editingRecipe.id, newRecipe)
-        if (!result.success) {
-          toast.error(result.message ?? "Une erreur est survenue")
-          return
+    setIsSubmitting(true)
+    startTransition(() => {
+      ;(async () => {
+        try {
+          const newRecipe = {
+            ...data,
+            createdAt: new Date(),
+            id: crypto.randomUUID(),
+          }
+          addOptimisticRecipes({ ...newRecipe, sending: true })
+          if (editingRecipe) {
+            const result = await updateRecipesAction(
+              editingRecipe.id,
+              newRecipe
+            )
+            if (!result.success) {
+              toast.error(result.message ?? "Une erreur est survenue")
+              return
+            }
+            toast.success("Recette mise à jour !")
+          } else {
+            const result = await addRecipesAction(newRecipe)
+            if (!result.success) {
+              toast.error(result.message ?? "Une erreur est survenue")
+              return
+            }
+            toast.success("Recette ajoutée !", {
+              description: `La recette "${data.name}" a été ajoutée avec succès !`,
+            })
+          }
+          const updatedRecipes = await getRecipesAction()
+          setRecipes(updatedRecipes ?? [])
+          form.reset({
+            name: "",
+            description: "",
+            ingredients: "",
+            instructions: "",
+            prepTime: "",
+            servings: "",
+          })
+          setEditingRecipe(null)
+        } finally {
+          setIsSubmitting(false)
         }
-        toast.success("Recette mise à jour !")
-      } else {
-        //message d'erreur si l'ajout a échoué server
-        const result = await addRecipesAction(newRecipe)
-        if (!result.success) {
-          toast.error(result.message ?? "Une erreur est survenue")
-          return
-        }
-        toast.success("Recette ajoutée !", {
-          description: `La recette "${data.name}" a été ajoutée avec succès !`,
-        })
-      }
+      })()
     })
+  }
 
-    const updatedRecipes = await getRecipesAction()
-    setRecipes(updatedRecipes ?? [])
+  function handleEdit(recipe: Recipe) {
+    setEditingRecipe(recipe)
+    form.reset(recipe) // Remplir le formulaire avec les données de la recette à éditer
+    setTimeout(() => {
+      if (formRef.current) {
+        formRef.current.scrollIntoView({ behavior: "smooth", block: "start" })
+      }
+    }, 100)
+  }
+
+  function handleCancelEdit() {
+    setEditingRecipe(null)
     form.reset({
       name: "",
       description: "",
@@ -98,31 +138,30 @@ export default function AddRecipesForm() {
       instructions: "",
       prepTime: "",
       servings: "",
-    }) // Réinitialiser le formulaire après soumission
-  }
-
-  function handleEdit(recipe: Recipe) {
-    setEditingRecipe(recipe)
-    form.reset(recipe) // Remplir le formulaire avec les données de la recette à éditer
+    })
   }
 
   async function deleteRecipe(id: string): Promise<void> {
     await deleteRecipesAction(id)
-    setRecipes(recipes.filter((recipe) => recipe.id !== id))
+    const updatedRecipes = await getRecipesAction()
+    setRecipes(updatedRecipes ?? [])
     toast.success("Recette supprimée !", {
       description: `La recette a été supprimée avec succès !`,
     })
+    setEditingRecipe(null)
   }
 
   return (
     <div className="min-h-screen bg-background">
       <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Form Section */}
-        <Card className="mb-10">
+        <Card className="mb-10" ref={formRef}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-2xl">
               <PlusCircle className="h-6 w-6 text-primary" />
-              Ajouter une nouvelle recette
+              {editingRecipe
+                ? "Modifier la recette"
+                : "Ajouter une nouvelle recette"}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -238,10 +277,95 @@ export default function AddRecipesForm() {
                   )}
                 />
 
-                <Button type="submit" className="w-full sm:w-auto">
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Ajouter la recette
-                </Button>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  {editingRecipe ? (
+                    <>
+                      <Button
+                        type="submit"
+                        className="w-full sm:w-auto"
+                        variant="default"
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? (
+                          <span className="flex items-center">
+                            <svg
+                              className="mr-2 h-4 w-4 animate-spin text-white"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              ></circle>
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8v8z"
+                              ></path>
+                            </svg>
+                            Enregistrement...
+                          </span>
+                        ) : (
+                          <>
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Modifier la recette
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        type="button"
+                        className="w-full sm:w-auto"
+                        variant="secondary"
+                        onClick={handleCancelEdit}
+                        disabled={isSubmitting}
+                      >
+                        Annuler
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      type="submit"
+                      className="w-full sm:w-auto"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <span className="flex items-center">
+                          <svg
+                            className="mr-2 h-4 w-4 animate-spin text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8v8z"
+                            ></path>
+                          </svg>
+                          Enregistrement...
+                        </span>
+                      ) : (
+                        <>
+                          <PlusCircle className="mr-2 h-4 w-4" />
+                          Ajouter la recette
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
               </form>
             </Form>
           </CardContent>
@@ -271,87 +395,92 @@ export default function AddRecipesForm() {
             </Card>
           ) : (
             <div className="space-y-4">
-              {optimisticRecipes.map((recipe) => (
-                <Card
-                  key={recipe.id}
-                  className="overflow-hidden transition-shadow hover:shadow-md"
-                >
-                  <CardContent className="p-0">
-                    <div className="flex flex-col sm:flex-row">
-                      <div className="flex-1 p-5">
-                        <div className="mb-2 flex items-start justify-between gap-4">
-                          <h3 className="text-lg font-semibold">
-                            {recipe.name}
-                          </h3>
-                          <div className="flex gap-2">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="shrink-0 text-muted-foreground hover:text-primary"
-                              aria-label="Modifier la recette"
-                              onClick={() => handleEdit(recipe)}
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => deleteRecipe(recipe.id)}
-                              className="shrink-0 text-muted-foreground hover:text-destructive"
-                              aria-label="Supprimer la recette"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+              {optimisticRecipes.map((recipe) => {
+                return (
+                  <Card
+                    key={recipe.id}
+                    className={cn(
+                      "overflow-hidden transition-shadow hover:shadow-md",
+                      { "animate-color-cycle": recipe.sending }
+                    )}
+                  >
+                    <CardContent className="p-0">
+                      <div className="flex flex-col sm:flex-row">
+                        <div className="flex-1 p-5">
+                          <div className="mb-2 flex items-start justify-between gap-4">
+                            <h3 className="text-lg font-semibold">
+                              {recipe.name}
+                            </h3>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="shrink-0 text-muted-foreground hover:text-primary"
+                                aria-label="Modifier la recette"
+                                onClick={() => handleEdit(recipe)}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => deleteRecipe(recipe.id)}
+                                className="shrink-0 text-muted-foreground hover:text-destructive"
+                                aria-label="Supprimer la recette"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </div>
-                        </div>
 
-                        {recipe.description && (
-                          <p className="mb-3 text-sm text-muted-foreground">
-                            {recipe.description}
-                          </p>
-                        )}
-
-                        <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-                          {recipe.prepTime && (
-                            <span className="flex items-center gap-1">
-                              <Clock className="h-4 w-4" />
-                              {recipe.prepTime}
-                            </span>
+                          {recipe.description && (
+                            <p className="mb-3 text-sm text-muted-foreground">
+                              {recipe.description}
+                            </p>
                           )}
-                          {recipe.servings && (
-                            <span className="flex items-center gap-1">
-                              <Users className="h-4 w-4" />
-                              {recipe.servings}
-                            </span>
+
+                          <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+                            {recipe.prepTime && (
+                              <span className="flex items-center gap-1">
+                                <Clock className="h-4 w-4" />
+                                {recipe.prepTime}
+                              </span>
+                            )}
+                            {recipe.servings && (
+                              <span className="flex items-center gap-1">
+                                <Users className="h-4 w-4" />
+                                {recipe.servings}
+                              </span>
+                            )}
+                          </div>
+
+                          {recipe.ingredients && (
+                            <div className="mt-4">
+                              <p className="mb-1 text-sm font-medium">
+                                Ingrédients:
+                              </p>
+                              <p className="text-sm whitespace-pre-line text-muted-foreground">
+                                {recipe.ingredients}
+                              </p>
+                            </div>
+                          )}
+
+                          {recipe.instructions && (
+                            <div className="mt-4">
+                              <p className="mb-1 text-sm font-medium">
+                                Instructions:
+                              </p>
+                              <p className="text-sm whitespace-pre-line text-muted-foreground">
+                                {recipe.instructions}
+                              </p>
+                            </div>
                           )}
                         </div>
-
-                        {recipe.ingredients && (
-                          <div className="mt-4">
-                            <p className="mb-1 text-sm font-medium">
-                              Ingrédients:
-                            </p>
-                            <p className="text-sm whitespace-pre-line text-muted-foreground">
-                              {recipe.ingredients}
-                            </p>
-                          </div>
-                        )}
-
-                        {recipe.instructions && (
-                          <div className="mt-4">
-                            <p className="mb-1 text-sm font-medium">
-                              Instructions:
-                            </p>
-                            <p className="text-sm whitespace-pre-line text-muted-foreground">
-                              {recipe.instructions}
-                            </p>
-                          </div>
-                        )}
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                )
+              })}
             </div>
           )}
         </section>
