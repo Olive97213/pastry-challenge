@@ -15,11 +15,11 @@ export default async function Home() {
     })),
   ]
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10">
       <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-            <BookOpen className="h-8 w-8 text-muted-foreground" />
+          <div className="mb-4 flex items-center justify-center rounded-full bg-primary/10 p-4">
+            <BookOpen className="h-10 w-10 animate-bounce text-primary" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
             Bienvenue sur RecetteBook

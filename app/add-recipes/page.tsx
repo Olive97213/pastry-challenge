@@ -152,7 +152,7 @@ export default function AddRecipesForm() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10">
       <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Form Section */}
         <Card className="mb-10" ref={formRef}>
