@@ -1,11 +1,15 @@
 "use server"
 
+// Fonctions d'accès aux données (DAO) vers la base de données locale
 import { addRecipes as addRecipesDao } from "@/db/sgbd"
 import { getRecipes as getRecipesDao } from "@/db/sgbd"
 import { deleteRecipes as deleteRecipesDao } from "@/db/sgbd"
 import { updateRecipes as updateRecipesDao } from "@/db/sgbd"
+// Types de recette et format d'erreur pour la validation
 import { Recipe, ValidationError } from "@/lib/types"
+// Permet de revalider la page server-side après une modification de données
 import { revalidatePath } from "next/cache"
+// Schéma de validation zod partagé avec le formulaire client
 import { formSchema, FormSchemaType } from "./schema"
 
 export type FormState = {
@@ -20,6 +24,7 @@ export const addRecipesAction = async (
   // on promet de retourner un FormState
 
   // 1. Validation Zod côté serveur
+  // safeParse vérifie les données et retourne success/erreurs
   const parsed = formSchema.safeParse(recipe)
 
   if (!parsed.success) {
@@ -45,10 +50,12 @@ export const addRecipesAction = async (
   } catch (error) {
     return { success: false, message: `Server Error ${error}` } // erreur BDD
   } finally {
+    // Revalide la page d'ajout de recette pour rafraîchir le rendu côté serveur
     revalidatePath("/add-recipes")
   }
 }
 
+// Récupère toutes les recettes depuis la base de données
 export const getRecipesAction = async () => {
   console.log("get recipes action")
   try {
@@ -61,6 +68,7 @@ export const getRecipesAction = async () => {
 }
 
 export const deleteRecipesAction = async (id: string) => {
+  // Supprime une recette à partir de son identifiant
   console.log("delete recipes action", id)
   try {
     await deleteRecipesDao(id)
@@ -68,6 +76,7 @@ export const deleteRecipesAction = async (id: string) => {
     console.error("Failed to delete recipe", error)
     throw error
   } finally {
+    // Revalide la page pour mettre à jour la liste des recettes affichée
     revalidatePath("/add-recipes")
   }
 }
@@ -75,6 +84,7 @@ export const updateRecipesAction = async (
   id: string,
   recipe: Omit<Recipe, "id">
 ): Promise<FormState> => {
+  // Validation côté serveur avant de mettre à jour la recette
   const parsed = formSchema.safeParse(recipe)
   if (!parsed.success) {
     // Zod a trouvé des erreurs — on les formate et on les retourne
@@ -98,6 +108,7 @@ export const updateRecipesAction = async (
     console.error("Failed to update recipe", error)
     return { success: false, message: `Server Error ${error}` }
   } finally {
+    // Revalide la page pour rafraîchir les données après la mise à jour
     revalidatePath("/add-recipes")
   }
 }
