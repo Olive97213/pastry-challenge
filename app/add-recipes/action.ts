@@ -12,6 +12,8 @@ import { revalidatePath } from "next/cache"
 // Schéma de validation zod partagé avec le formulaire client
 import { formSchema, FormSchemaType } from "./schema"
 
+
+
 export type FormState = {
   success: boolean
   errors?: ValidationError[]
@@ -51,9 +53,13 @@ export const addRecipesAction = async (
     return { success: false, message: `Server Error ${error}` } // erreur BDD
   } finally {
     // Revalide la page d'ajout de recette pour rafraîchir le rendu côté serveur
+    // Revalider la page d'ajout ET la page `my-recipes` afin que
+    // les deux vues affichant la liste des recettes soient mises à jour.
     revalidatePath("/add-recipes")
+    revalidatePath("/my-recipes")
   }
 }
+
 
 // Récupère toutes les recettes depuis la base de données
 export const getRecipesAction = async () => {
@@ -78,6 +84,7 @@ export const deleteRecipesAction = async (id: string) => {
   } finally {
     // Revalide la page pour mettre à jour la liste des recettes affichée
     revalidatePath("/add-recipes")
+    revalidatePath("/my-recipes")
   }
 }
 export const updateRecipesAction = async (
@@ -110,5 +117,6 @@ export const updateRecipesAction = async (
   } finally {
     // Revalide la page pour rafraîchir les données après la mise à jour
     revalidatePath("/add-recipes")
+    revalidatePath("/my-recipes")
   }
 }

@@ -49,6 +49,26 @@
       "servings": "8",
       "createdAt": "2026-05-30T12:32:11.589Z",
       "id": "5"
+    },
+    {
+      "name": "tartes aux burnes",
+      "description": "ol,lkjok,",
+      "ingredients": "knkn",
+      "instructions": "knknk",
+      "prepTime": "223",
+      "servings": "kk,",
+      "createdAt": "2026-06-08T18:11:45.013Z",
+      "id": "6"
+    },
+    {
+      "name": "poire",
+      "description": "jnjnj",
+      "ingredients": "njn",
+      "instructions": "jnjn",
+      "prepTime": "33",
+      "servings": "3",
+      "createdAt": "2026-06-08T18:12:16.788Z",
+      "id": "7"
     }
   ]
 }
