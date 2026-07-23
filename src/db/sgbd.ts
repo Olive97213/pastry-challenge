@@ -34,7 +34,7 @@ export default async function lowDb() {
 }
 // Initialise la base JSON en assurant que le fichier existe avec les données par défaut
 async function initDb() {
-  const db = await JSONFilePreset('./db/db.json', defaultData)
+  const db = await JSONFilePreset('./src/db/db.json', defaultData)
   return db
 }
 
