@@ -1,16 +1,33 @@
-import "dotenv/config";
+import { config } from "dotenv";
 import { defineConfig } from "drizzle-kit";
 
+config({
+  path: ".env.local",
+});
+
+const databaseUrl =
+  process.env.POSTGRES_URL_LOCAL ?? process.env.POSTGRES_URL;
+
+if (!databaseUrl) {
+  throw new Error(
+    "❌ Missing database URL. Please define POSTGRES_URL_LOCAL (development) or POSTGRES_URL (production)."
+  );
+}
+
 export default defineConfig({
-  out: "./drizzle",
-  schema: "./src/db/schema",
   dialect: "postgresql",
 
-  verbose: true,
-  strict: true,
+  schema: "./src/db/schema",
+
+  out: "./drizzle",
+
   schemaFilter: ["public"],
 
+  verbose: true,
+
+  strict: true,
+
   dbCredentials: {
-    url: process.env.POSTGRES_URL_LOCAL!,
+    url: databaseUrl,
   },
 });
