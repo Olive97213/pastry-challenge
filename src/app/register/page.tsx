@@ -28,13 +28,11 @@ export default function RegisterPage() {
 
   async function onSubmit(data: RegisterInput) {
 
-  console.log("FORM DATA :", data);
+    const result = await registerUser(data);
 
-  const result = await registerUser(data);
+    console.log(result);
 
-  console.log("RESULT :", result);
-
-}
+  }
 
 
   return (
@@ -51,15 +49,15 @@ export default function RegisterPage() {
 
 
         <input
-          {...register("username")}
+          {...register("name")}
           placeholder="Pseudo"
           className="border p-2"
         />
 
         {
-          errors.username && (
+          errors.name && (
             <p className="text-red-500">
-              {errors.username.message}
+              {errors.name.message}
             </p>
           )
         }

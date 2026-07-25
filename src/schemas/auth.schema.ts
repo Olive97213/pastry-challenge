@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const registerSchema = z.object({
-  username: z
+  name: z
     .string()
     .min(3, "Le pseudo doit contenir au moins 3 caractères")
     .max(30, "Le pseudo ne doit pas dépasser 30 caractères"),

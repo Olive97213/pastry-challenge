@@ -31,7 +31,7 @@ export async function registerUser(
   }
 
   const {
-    username,
+    name,
     email,
     password,
   } = validation.data;
@@ -56,7 +56,7 @@ export async function registerUser(
 
 
   await db.insert(users).values({
-    username,
+    name,
     email,
     passwordHash,
   });
