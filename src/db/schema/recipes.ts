@@ -68,24 +68,26 @@ export const recipes = pgTable("recipes", {
 
 
   /**
-   * Présentation courte de la recette.
-   */
-  description: text("description")
-    .notNull(),
+ * Présentation courte de la recette.
+ *
+ * Optionnelle pour permettre
+ * la sauvegarde d'un brouillon.
+ */
+description: text("description"),
 
 
-  /**
-   * Étapes détaillées de réalisation.
-   */
-  instructions: text("instructions")
-    .notNull(),
+/**
+ * Étapes détaillées de réalisation.
+ *
+ * Peut être complétée avant publication.
+ */
+instructions: text("instructions"),
 
 
-  /**
-   * Temps en minutes.
-   */
-  prepTime: integer("prep_time")
-    .notNull(),
+ /**
+ * Temps de préparation en minutes.
+ */
+prepTime: integer("prep_time"),
 
 
   /**
@@ -101,10 +103,9 @@ export const recipes = pgTable("recipes", {
 
 
   /**
-   * Nombre de portions réalisées.
-   */
-  servings: integer("servings")
-    .notNull(),
+ * Nombre de portions.
+ */
+servings: integer("servings"),
 
 
   /**

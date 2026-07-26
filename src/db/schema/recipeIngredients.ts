@@ -3,6 +3,7 @@ import {
   uuid,
   varchar,
   integer,
+  text,
 } from "drizzle-orm/pg-core";
 
 import { recipes } from "./recipes";
@@ -19,7 +20,7 @@ export const recipeIngredients = pgTable(
   {
 
     /**
-     * Identifiant unique.
+     * Identifiant unique de l'ingrédient.
      */
     id: uuid("id")
       .defaultRandom()
@@ -27,7 +28,7 @@ export const recipeIngredients = pgTable(
 
 
     /**
-     * Recette concernée.
+     * Recette à laquelle appartient l'ingrédient.
      */
     recipeId: uuid("recipe_id")
       .notNull()
@@ -58,7 +59,7 @@ export const recipeIngredients = pgTable(
 
 
     /**
-     * Unité.
+     * Unité de mesure.
      *
      * Exemple :
      * g, ml, pièce
@@ -69,8 +70,17 @@ export const recipeIngredients = pgTable(
 
 
     /**
-     * Permet de conserver l'ordre
-     * d'affichage des ingrédients.
+     * Informations complémentaires.
+     *
+     * Exemple :
+     * "à température ambiante"
+     * "haché grossièrement"
+     */
+    note: text("note"),
+
+
+    /**
+     * Ordre d'affichage des ingrédients.
      */
     position: integer("position")
       .notNull()
