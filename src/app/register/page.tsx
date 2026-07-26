@@ -49,15 +49,15 @@ export default function RegisterPage() {
 
 
         <input
-          {...register("name")}
+          {...register("username")}
           placeholder="Pseudo"
           className="border p-2"
         />
 
         {
-          errors.name && (
+          errors.username && (
             <p className="text-red-500">
-              {errors.name.message}
+              {errors.username.message}
             </p>
           )
         }
