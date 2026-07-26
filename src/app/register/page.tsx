@@ -10,7 +10,7 @@ import {
   type RegisterInput,
 } from "@/schemas/auth.schema";
 
-import { registerUser } from "@/actions/auth";
+import { registerUser } from "@/actions/register";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -42,7 +42,7 @@ export function RegisterForm() {
     const result = await registerUser(data);
 
     if (result.success) {
-      reset({ username: "", email: "", password: "" });
+      reset({ username: "", email: "", password: "", confirmPassword: "" });
       setFeedback({ type: "success", message: result.message });
       return;
     }
@@ -125,6 +125,23 @@ export function RegisterForm() {
             {errors.password && (
               <p className="text-sm text-destructive">
                 {errors.password.message}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium" htmlFor="confirmPassword">
+              Confirmer le mot de passe
+            </label>
+            <Input
+              id="confirmPassword"
+              {...register("confirmPassword")}
+              placeholder="Répéter le mot de passe"
+              type="password"
+            />
+            {errors.confirmPassword && (
+              <p className="text-sm text-destructive">
+                {errors.confirmPassword.message}
               </p>
             )}
           </div>
