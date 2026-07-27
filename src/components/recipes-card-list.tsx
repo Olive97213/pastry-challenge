@@ -1,8 +1,8 @@
 // Composant qui affiche une card de recette individuelle
-import { RecipesCard } from "@/components/recipes-card"
+import { RecipesCard } from '@/components/recipes-card';
 
 // Type de donnée Recipe importé depuis le dossier de types partagé
-import { Recipe } from "@/lib/types"
+import { Recipe } from '@/lib/types';
 
 // Composant de liste qui transforme un tableau de recettes en cards
 export function RecipesCardList({ recipes }: { recipes: Recipe[] }) {
@@ -21,7 +21,7 @@ export function RecipesCardList({ recipes }: { recipes: Recipe[] }) {
         />
       ))}
     </div>
-  )
+  );
 }
 // Réexporter le type Recipe pour le rendre disponible ailleurs si besoin
-export type { Recipe }
+export type { Recipe };

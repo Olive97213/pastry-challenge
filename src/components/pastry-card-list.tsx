@@ -1,8 +1,8 @@
 // Composant de carte unique pour afficher une pâtisserie
-import { PastryCard } from "@/components/pastry-card"
+import { PastryCard } from '@/components/pastry-card';
 
 // Type réutilisable représentant une pâtisserie
-import { Pastry } from "@/lib/types"
+import { Pastry } from '@/lib/types';
 
 // Composant de liste qui transforme un tableau de pâtisseries en cards
 export function PastryCardList({ pastries }: { pastries: Pastry[] }) {
@@ -18,7 +18,7 @@ export function PastryCardList({ pastries }: { pastries: Pastry[] }) {
         />
       ))}
     </div>
-  )
+  );
 }
 // Réexport du type Pastry pour simplifier les imports ailleurs
-export type { Pastry }
+export type { Pastry };

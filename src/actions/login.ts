@@ -1,13 +1,10 @@
-"use server";
+'use server';
 
-import { AuthError } from "next-auth";
+import { AuthError } from 'next-auth';
 
-import { signIn } from "@/auth";
+import { signIn } from '@/auth';
 
-import type {
-  ActionResponse,
-} from "@/types/auth";
-
+import type { ActionResponse } from '@/types/auth';
 
 /**
  * Authentifie un utilisateur avec Auth.js.
@@ -15,69 +12,44 @@ import type {
  * Le contrôle du mot de passe est effectué
  * dans le provider Credentials de auth.ts.
  */
-export async function loginUser(
-  formData: FormData
-): Promise<ActionResponse> {
-
-
+export async function loginUser(formData: FormData): Promise<ActionResponse> {
   /**
    * Récupération sécurisée des données du formulaire.
    */
-  const email =
-    formData.get("email");
+  const email = formData.get('email');
 
-  const password =
-    formData.get("password");
+  const password = formData.get('password');
 
-
-
-  if (
-    typeof email !== "string" ||
-    typeof password !== "string"
-  ) {
-
+  if (typeof email !== 'string' || typeof password !== 'string') {
     return {
       success: false,
-      message: "Données invalides",
+      message: 'Données invalides',
     };
   }
 
-
-
   try {
-
     /**
      * Authentification via Auth.js.
      *
      * redirectTo permet de rediriger
      * après une connexion réussie.
      */
-    await signIn(
-      "credentials",
-      {
-        email,
-        password,
-        redirectTo: "/",
-      }
-    );
-
-
+    await signIn('credentials', {
+      email,
+      password,
+      redirectTo: '/',
+    });
   } catch (error) {
-
-
     /**
      * Erreur générée par Auth.js
      * lorsque les identifiants sont incorrects.
      */
     if (error instanceof AuthError) {
-
       return {
         success: false,
-        message:
-          "Email ou mot de passe incorrect",
+        message: 'Email ou mot de passe incorrect',
       };
     }
-
 
     /**
      * Les autres erreurs doivent remonter
@@ -86,11 +58,8 @@ export async function loginUser(
     throw error;
   }
 
-
-
   return {
     success: true,
-    message:
-      "Connexion réussie",
+    message: 'Connexion réussie',
   };
 }

@@ -1,11 +1,10 @@
-import { relations } from "drizzle-orm";
+import { relations } from 'drizzle-orm';
 
-import { users } from "./users";
-import { accounts } from "./accounts";
-import { sessions } from "./sessions";
-import { recipes } from "./recipes";
-import { recipeIngredients } from "./recipeIngredients";
-
+import { users } from './users';
+import { accounts } from './accounts';
+import { sessions } from './sessions';
+import { recipes } from './recipes';
+import { recipeIngredients } from './recipeIngredients';
 
 /**
  * Relations utilisateur.
@@ -21,7 +20,6 @@ export const usersRelations = relations(users, ({ many }) => ({
   recipes: many(recipes),
 }));
 
-
 /**
  * Relation compte OAuth.
  *
@@ -34,7 +32,6 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
   }),
 }));
 
-
 /**
  * Relation session.
  *
@@ -46,7 +43,6 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
     references: [users.id],
   }),
 }));
-
 
 /**
  * Relation recette.
@@ -64,7 +60,6 @@ export const recipesRelations = relations(recipes, ({ one, many }) => ({
   ingredients: many(recipeIngredients),
 }));
 
-
 /**
  * Relation ingrédient.
  *
@@ -77,5 +72,5 @@ export const recipeIngredientsRelations = relations(
       fields: [recipeIngredients.recipeId],
       references: [recipes.id],
     }),
-  })
+  }),
 );

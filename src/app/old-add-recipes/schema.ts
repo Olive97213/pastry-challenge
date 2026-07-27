@@ -1,4 +1,4 @@
-import z from 'zod'
+import z from 'zod';
 
 export const formSchema = z.object({
   name: z.string().min(2, {
@@ -19,7 +19,5 @@ export const formSchema = z.object({
   servings: z.string().min(1, {
     message: 'Servings must be at least 1 character.',
   }),
-  
-})
-export type FormSchemaType = z.infer<typeof formSchema>
-    
+});
+export type FormSchemaType = z.infer<typeof formSchema>;

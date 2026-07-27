@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs";
+import bcrypt from 'bcryptjs';
 
 const SALT_ROUNDS = 12;
 
@@ -8,7 +8,7 @@ export async function hashPassword(password: string) {
 
 export async function comparePassword(
   password: string,
-  hashedPassword: string
+  hashedPassword: string,
 ) {
   return bcrypt.compare(password, hashedPassword);
 }

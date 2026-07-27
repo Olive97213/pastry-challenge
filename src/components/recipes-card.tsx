@@ -4,16 +4,16 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "./ui/card"
+} from './ui/card';
 
 // Définition des props attendues par le composant RecipesCard
 interface RecipesCardProps {
-  name: string
-  description: string
-  ingredients: string
-  instructions: string
-  prepTime: string
-  servings: string
+  name: string;
+  description: string;
+  ingredients: string;
+  instructions: string;
+  prepTime: string;
+  servings: string;
 }
 
 // Composant de card qui affiche les informations d'une recette
@@ -51,5 +51,5 @@ export function RecipesCard({
         </ul>
       </CardContent>
     </Card>
-  )
+  );
 }

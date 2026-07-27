@@ -1,13 +1,13 @@
 // Import du composant Image optimisé de Next.js
-import Image from "next/image"
+import Image from 'next/image';
 // Import des composants de carte réutilisables
-import { Card, CardHeader, CardTitle } from "./ui/card"
+import { Card, CardHeader, CardTitle } from './ui/card';
 
 // Définition des props attendues par le composant PastryCard
 interface PastryCardProps {
-  imageSrc: string
-  title: string
-  imageAlt?: string
+  imageSrc: string;
+  title: string;
+  imageAlt?: string;
 }
 
 // Composant qui affiche une carte de pâtisserie avec une image et un titre
@@ -30,5 +30,5 @@ export function PastryCard({ imageSrc, title, imageAlt }: PastryCardProps) {
         {/* <CardDescription>{description}</CardDescription> */}
       </CardHeader>
     </Card>
-  )
+  );
 }

@@ -5,50 +5,44 @@ import {
   timestamp,
   uuid,
   varchar,
-} from "drizzle-orm/pg-core";
+} from 'drizzle-orm/pg-core';
 
-import { timestamps } from "./common";
-import { userRoleEnum } from "./enums";
+import { timestamps } from './common';
+import { userRoleEnum } from './enums';
 
-export const users = pgTable("users", {
-  id: uuid("id")
-    .defaultRandom()
-    .primaryKey(),
+export const users = pgTable('users', {
+  id: uuid('id').defaultRandom().primaryKey(),
 
-  username: varchar("username", {
+  username: varchar('username', {
     length: 30,
   })
     .notNull()
     .unique(),
 
-  email: varchar("email", {
+  email: varchar('email', {
     length: 255,
   })
     .notNull()
     .unique(),
 
-  passwordHash: text("password_hash"),
+  passwordHash: text('password_hash'),
 
-  emailVerified: timestamp("email_verified", {
+  emailVerified: timestamp('email_verified', {
     withTimezone: true,
-    mode: "date",
+    mode: 'date',
   }),
 
-  image: text("image"),
+  image: text('image'),
 
-  bio: text("bio"),
+  bio: text('bio'),
 
-  role: userRoleEnum("role")
-    .default("USER")
-    .notNull(),
+  role: userRoleEnum('role').default('USER').notNull(),
 
-  isActive: boolean("is_active")
-    .default(true)
-    .notNull(),
+  isActive: boolean('is_active').default(true).notNull(),
 
-  lastLoginAt: timestamp("last_login_at", {
+  lastLoginAt: timestamp('last_login_at', {
     withTimezone: true,
-    mode: "date",
+    mode: 'date',
   }),
 
   ...timestamps,

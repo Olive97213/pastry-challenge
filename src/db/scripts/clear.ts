@@ -1,26 +1,24 @@
 #!/usr/bin/env node
 
-import pg from "pg";
-import { config } from "dotenv";
+import pg from 'pg';
+import { config } from 'dotenv';
 
 config({
-  path: ".env.local",
+  path: '.env.local',
 });
 
 const clearDb = async () => {
   const databaseUrl = process.env.POSTGRES_URL_LOCAL;
 
   if (!databaseUrl) {
-    throw new Error(
-      "POSTGRES_URL_LOCAL is not defined in .env.local"
-    );
+    throw new Error('POSTGRES_URL_LOCAL is not defined in .env.local');
   }
 
   const client = new pg.Client({
     connectionString: databaseUrl,
   });
 
-  console.log("⏳ Checking connection...");
+  console.log('⏳ Checking connection...');
   console.log(`🗄️ Database: pastry`);
 
   await client.connect();
@@ -47,7 +45,6 @@ const clearDb = async () => {
     END $$;
   `);
 
-
   /**
    * Suppression des ENUM PostgreSQL
    */
@@ -68,23 +65,19 @@ const clearDb = async () => {
     END $$;
   `);
 
-
   const end = Date.now();
 
-  console.log(
-    `✅ Database cleared in ${end - start} ms`
-  );
+  console.log(`✅ Database cleared in ${end - start} ms`);
 
   await client.end();
 
   process.exit(0);
 };
 
-
 try {
   await clearDb();
 } catch (error) {
-  console.error("❌ Database reset failed");
+  console.error('❌ Database reset failed');
   console.error(error);
 
   process.exit(1);

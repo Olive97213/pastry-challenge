@@ -1,41 +1,23 @@
-"use server";
+'use server';
 
+import { auth } from '@/auth';
 
-import { auth } from "@/auth";
+import { db } from '@/db/client';
 
-import { db } from "@/db/client";
+import { recipes, recipeIngredients } from '@/db/schema';
 
-import {
-  recipes,
-  recipeIngredients,
-} from "@/db/schema";
+import { generateSlug } from '@/lib/slug';
 
-
-import {
-  generateSlug,
-} from "@/lib/slug";
-
-
-import type {
-  RecipeActionResponse,
-} from "@/types/recipe";
-
-
+import type { RecipeActionResponse } from '@/types/recipe';
 
 type CreateRecipeInput = {
-
   title: string;
 
   description?: string;
 
-  difficulty?:
-    | "BEGINNER"
-    | "INTERMEDIATE"
-    | "ADVANCED";
-
+  difficulty?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 
   instructions?: string;
-
 
   prepTime?: number;
 
@@ -43,23 +25,16 @@ type CreateRecipeInput = {
 
   restTime?: number;
 
-
   servings?: number;
 
-
   ingredients?: {
-
     name: string;
 
     quantity?: number;
 
     unit?: string;
-
   }[];
-
 };
-
-
 
 /**
  * Création d'une recette brouillon.
@@ -70,156 +45,81 @@ type CreateRecipeInput = {
  * - ajoute les ingrédients associés
  */
 export async function createRecipe(
-  data: CreateRecipeInput
+  data: CreateRecipeInput,
 ): Promise<RecipeActionResponse> {
-
-
-
   /**
    * Vérification de la session.
    */
-  const session =
-    await auth();
-
-
+  const session = await auth();
 
   if (!session?.user?.id) {
-
     return {
-
       success: false,
 
-      message:
-        "Utilisateur non connecté",
-
+      message: 'Utilisateur non connecté',
     };
-
   }
-
-
 
   /**
    * Génération du slug.
    */
-  const slug =
-    generateSlug(
-      data.title
-    );
-
-
+  const slug = generateSlug(data.title);
 
   /**
    * Insertion de la recette.
    */
-  const [recipe] =
-    await db
-      .insert(recipes)
-      .values({
+  const [recipe] = await db
+    .insert(recipes)
+    .values({
+      userId: session.user.id,
 
-        userId:
-          session.user.id,
+      title: data.title,
 
+      slug,
 
-        title:
-          data.title,
+      description: data.description,
 
+      instructions: data.instructions,
 
-        slug,
+      prepTime: data.prepTime,
 
+      cookTime: data.cookTime,
 
-        description:
-          data.description,
+      restTime: data.restTime,
 
+      servings: data.servings,
 
-        instructions:
-          data.instructions,
-
-
-        prepTime:
-          data.prepTime,
-
-
-        cookTime:
-          data.cookTime,
-
-
-        restTime:
-          data.restTime,
-
-
-        servings:
-          data.servings,
-
-
-        difficulty:
-          data.difficulty,
-
-      })
-      .returning({
-        id: recipes.id,
-      });
-
-
-
+      difficulty: data.difficulty,
+    })
+    .returning({
+      id: recipes.id,
+    });
 
   /**
    * Ajout des ingrédients liés
    * à la recette.
    */
-  if (
-    data.ingredients &&
-    data.ingredients.length > 0
-  ) {
+  if (data.ingredients && data.ingredients.length > 0) {
+    await db.insert(recipeIngredients).values(
+      data.ingredients.map((ingredient, index) => ({
+        recipeId: recipe.id,
 
+        name: ingredient.name,
 
-    await db
-      .insert(recipeIngredients)
-      .values(
+        quantity: ingredient.quantity,
 
-        data.ingredients.map(
-          (
-            ingredient,
-            index
-          ) => ({
+        unit: ingredient.unit,
 
-            recipeId:
-              recipe.id,
-
-
-            name:
-              ingredient.name,
-
-
-            quantity:
-              ingredient.quantity,
-
-
-            unit:
-              ingredient.unit,
-
-
-            position:
-              index,
-
-          })
-        )
-
-      );
-
+        position: index,
+      })),
+    );
   }
 
-
-
   return {
-
     success: true,
 
-    message:
-      "Recette enregistrée",
+    message: 'Recette enregistrée',
 
-    recipeId:
-      recipe.id,
-
+    recipeId: recipe.id,
   };
-
 }

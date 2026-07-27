@@ -1,23 +1,30 @@
-"use client"
+'use client';
 
-import Link from "next/link"
-import { useState } from "react"
-import { Menu, X, ChefHat, BookOpen, PlusCircle, UserCircle2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import Link from 'next/link';
+import { useState } from 'react';
+import {
+  Menu,
+  X,
+  ChefHat,
+  BookOpen,
+  PlusCircle,
+  UserCircle2,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const navLinks = [
-    { href: "/my-recipes", label: "Mes Recettes", icon: BookOpen },
-    { href: "/add-recipes", label: "Ajouter Recette", icon: PlusCircle },
-    { href: "/account", label: "Mon compte", icon: UserCircle2 },
-  ]
+    { href: '/my-recipes', label: 'Mes Recettes', icon: BookOpen },
+    { href: '/add-recipes', label: 'Ajouter Recette', icon: PlusCircle },
+    { href: '/account', label: 'Mon compte', icon: UserCircle2 },
+  ];
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+    <nav className="border-border bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
@@ -25,8 +32,8 @@ export function Navbar() {
             href="/"
             className="flex items-center gap-2 transition-opacity hover:opacity-80"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-              <ChefHat className="h-5 w-5 text-primary-foreground" />
+            <div className="bg-primary flex h-9 w-9 items-center justify-center rounded-lg">
+              <ChefHat className="text-primary-foreground h-5 w-5" />
             </div>
             <span className="text-xl font-bold tracking-tight">
               RecetteBook
@@ -39,7 +46,7 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="group flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                className="group text-muted-foreground hover:bg-accent hover:text-accent-foreground flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
               >
                 <link.icon className="h-4 w-4 transition-transform group-hover:scale-110" />
                 {link.label}
@@ -53,7 +60,7 @@ export function Navbar() {
             size="icon"
             className="md:hidden"
             onClick={toggleMenu}
-            aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-label={isMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
           >
             {isMenuOpen ? (
               <X className="h-5 w-5" />
@@ -67,7 +74,7 @@ export function Navbar() {
       {/* Mobile Navigation */}
       <div
         className={`overflow-hidden transition-all duration-300 ease-in-out md:hidden ${
-          isMenuOpen ? "max-h-64 border-t border-border" : "max-h-0"
+          isMenuOpen ? 'border-border max-h-64 border-t' : 'max-h-0'
         }`}
       >
         <div className="space-y-1 px-4 py-3">
@@ -76,7 +83,7 @@ export function Navbar() {
               key={link.href}
               href={link.href}
               onClick={() => setIsMenuOpen(false)}
-              className="flex items-center gap-3 rounded-lg px-3 py-3 text-base font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+              className="text-muted-foreground hover:bg-accent hover:text-accent-foreground flex items-center gap-3 rounded-lg px-3 py-3 text-base font-medium transition-colors"
             >
               <link.icon className="h-5 w-5" />
               {link.label}
@@ -85,5 +92,5 @@ export function Navbar() {
         </div>
       </div>
     </nav>
-  )
+  );
 }

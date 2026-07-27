@@ -1,10 +1,10 @@
-"use client"
+'use client';
 
 // Composants UI utilisés pour construire le formulaire et les cards
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 // Icônes utilisées dans le formulaire et la liste des recettes
 import {
   PlusCircle,
@@ -13,14 +13,14 @@ import {
   Trash2,
   UtensilsCrossed,
   Pencil,
-} from "lucide-react"
+} from 'lucide-react';
 // Résolution de validation pour react-hook-form avec zod
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 // Schéma de validation et types du formulaire
-import { formSchema, FormSchemaType } from "./schema"
+import { formSchema, FormSchemaType } from './schema';
 // Notifications visuelles pour l'utilisateur
-import { toast } from "sonner"
+import { toast } from 'sonner';
 // Composants de formulaire personnalisés
 import {
   FormControl,
@@ -29,7 +29,7 @@ import {
   FormLabel,
   FormMessage,
   Form,
-} from "@/components/ui/form"
+} from '@/components/ui/form';
 // Hooks React pour gérer l'état, l'effet et l'optimistic UI
 import {
   startTransition,
@@ -37,19 +37,19 @@ import {
   useOptimistic,
   useState,
   useRef,
-} from "react"
+} from 'react';
 // Types et interfaces de recettes
-import { OptimisticField, Recipe, RecipeOptimistic } from "@/lib/types"
+import { OptimisticField, Recipe, RecipeOptimistic } from '@/lib/types';
 // Actions pour ajouter, mettre à jour et supprimer des recettes
 import {
   addRecipesAction,
   deleteRecipesAction,
   updateRecipesAction,
-} from "./action"
-import { getRecipesAction } from "./action"
+} from './action';
+import { getRecipesAction } from './action';
 
 // Utilitaire de concaténation conditionnelle de classes
-import { cn } from "@/lib/utils"
+import { cn } from '@/lib/utils';
 
 // Composant principal du formulaire d'ajout/édition de recettes
 export default function AddRecipesForm() {
@@ -57,140 +57,140 @@ export default function AddRecipesForm() {
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      ingredients: "",
-      instructions: "",
-      prepTime: "",
-      servings: "",
+      name: '',
+      description: '',
+      ingredients: '',
+      instructions: '',
+      prepTime: '',
+      servings: '',
     },
-  })
+  });
   // État local pour stocker les recettes affichées
-  const [recipes, setRecipes] = useState<Recipe[]>([])
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
   // État pour savoir si on est en train d'éditer une recette existante
-  const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null)
+  const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
   // Optimistic UI : on montre immédiatement la recette ajoutée pendant que l'action se termine
   const [optimisticRecipes, addOptimisticRecipes] = useOptimistic<
     RecipeOptimistic[],
     OptimisticField
-  >(recipes, (state, optimisticValue) => [...state, optimisticValue])
+  >(recipes, (state, optimisticValue) => [...state, optimisticValue]);
   // Référence vers le conteneur du formulaire pour effectuer un scroll en mode édition
-  const formRef = useRef<HTMLDivElement>(null)
+  const formRef = useRef<HTMLDivElement>(null);
   // Indicateur de soumission en cours pour désactiver les boutons
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Charge les recettes enregistrées une seule fois au montage du composant
   useEffect(() => {
     const fetchRecipes = async () => {
-      const recipes = await getRecipesAction()
-      setRecipes(recipes ?? [])
-    }
-    fetchRecipes()
-  }, [])
+      const recipes = await getRecipesAction();
+      setRecipes(recipes ?? []);
+    };
+    fetchRecipes();
+  }, []);
 
   // Gestion de la soumission du formulaire pour l'ajout ou la mise à jour
   async function onSubmit(data: FormSchemaType) {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     startTransition(() => {
-      ;(async () => {
+      (async () => {
         try {
           // Crée l'objet recette à partir du formulaire
           const newRecipe = {
             ...data,
             createdAt: new Date(),
             id: crypto.randomUUID(),
-          }
+          };
           // Ajout optimiste pour afficher rapidement la nouvelle recette
-          addOptimisticRecipes({ ...newRecipe, sending: true })
+          addOptimisticRecipes({ ...newRecipe, sending: true });
           if (editingRecipe) {
             // Mise à jour d'une recette existante
             const result = await updateRecipesAction(
               editingRecipe.id,
-              newRecipe
-            )
+              newRecipe,
+            );
             if (!result.success) {
-              toast.error(result.message ?? "Une erreur est survenue")
-              return
+              toast.error(result.message ?? 'Une erreur est survenue');
+              return;
             }
-            toast.success("Recette mise à jour !")
+            toast.success('Recette mise à jour !');
           } else {
             // Ajout d'une nouvelle recette
-            const result = await addRecipesAction(newRecipe)
+            const result = await addRecipesAction(newRecipe);
             if (!result.success) {
-              toast.error(result.message ?? "Une erreur est survenue")
-              return
+              toast.error(result.message ?? 'Une erreur est survenue');
+              return;
             }
-            toast.success("Recette ajoutée !", {
+            toast.success('Recette ajoutée !', {
               description: `La recette "${data.name}" a été ajoutée avec succès !`,
-            })
+            });
           }
           // Recharge la liste des recettes après le traitement
-          const updatedRecipes = await getRecipesAction()
-          setRecipes(updatedRecipes ?? [])
+          const updatedRecipes = await getRecipesAction();
+          setRecipes(updatedRecipes ?? []);
           // Réinitialise le formulaire après la soumission
           form.reset({
-            name: "",
-            description: "",
-            ingredients: "",
-            instructions: "",
-            prepTime: "",
-            servings: "",
-          })
-          setEditingRecipe(null)
+            name: '',
+            description: '',
+            ingredients: '',
+            instructions: '',
+            prepTime: '',
+            servings: '',
+          });
+          setEditingRecipe(null);
         } finally {
-          setIsSubmitting(false)
+          setIsSubmitting(false);
         }
-      })()
-    })
+      })();
+    });
   }
 
   // Passe le formulaire en mode édition en remplissant les champs
   function handleEdit(recipe: Recipe) {
-    setEditingRecipe(recipe)
-    form.reset(recipe) // Remplir le formulaire avec les données de la recette à éditer
+    setEditingRecipe(recipe);
+    form.reset(recipe); // Remplir le formulaire avec les données de la recette à éditer
     setTimeout(() => {
       if (formRef.current) {
-        formRef.current.scrollIntoView({ behavior: "smooth", block: "start" })
+        formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    }, 100)
+    }, 100);
   }
 
   // Annule l'édition en cours et remet le formulaire à zéro
   function handleCancelEdit() {
-    setEditingRecipe(null)
+    setEditingRecipe(null);
     form.reset({
-      name: "",
-      description: "",
-      ingredients: "",
-      instructions: "",
-      prepTime: "",
-      servings: "",
-    })
+      name: '',
+      description: '',
+      ingredients: '',
+      instructions: '',
+      prepTime: '',
+      servings: '',
+    });
   }
 
   // Supprime une recette et recharge la liste de recettes
   async function deleteRecipe(id: string): Promise<void> {
-    await deleteRecipesAction(id)
-    const updatedRecipes = await getRecipesAction()
-    setRecipes(updatedRecipes ?? [])
-    toast.success("Recette supprimée !", {
+    await deleteRecipesAction(id);
+    const updatedRecipes = await getRecipesAction();
+    setRecipes(updatedRecipes ?? []);
+    toast.success('Recette supprimée !', {
       description: `La recette a été supprimée avec succès !`,
-    })
-    setEditingRecipe(null)
+    });
+    setEditingRecipe(null);
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10">
+    <div className="from-primary/10 via-background to-secondary/10 min-h-screen bg-gradient-to-br">
       <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Section de formulaire : ajout ou édition d'une recette */}
         {/* Form Section */}
         <Card className="mb-10" ref={formRef}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-2xl">
-              <PlusCircle className="h-6 w-6 text-primary" />
+              <PlusCircle className="text-primary h-6 w-6" />
               {editingRecipe
-                ? "Modifier la recette"
-                : "Ajouter une nouvelle recette"}
+                ? 'Modifier la recette'
+                : 'Ajouter une nouvelle recette'}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -240,7 +240,7 @@ export default function AddRecipesForm() {
                         <FormLabel>Temps de préparation</FormLabel>
                         <FormControl>
                           <div className="relative">
-                            <Clock className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                            <Clock className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
                             <Input
                               className="pl-10"
                               placeholder="Ex: 45 minutes"
@@ -261,7 +261,7 @@ export default function AddRecipesForm() {
                         <FormLabel>Nombre de personnes</FormLabel>
                         <FormControl>
                           <div className="relative">
-                            <Users className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                            <Users className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
                             <Input
                               className="pl-10"
                               placeholder="Ex: 4 personnes"
@@ -408,20 +408,20 @@ export default function AddRecipesForm() {
         {/* Recipes List Section */}
         <section>
           <h2 className="mb-6 flex items-center gap-2 text-xl font-semibold">
-            <UtensilsCrossed className="h-5 w-5 text-primary" />
+            <UtensilsCrossed className="text-primary h-5 w-5" />
             Recettes ajoutées ({recipes.length})
           </h2>
 
           {recipes.length === 0 ? (
             <Card className="border-dashed">
               <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                <div className="mb-4 rounded-full bg-muted p-4">
-                  <UtensilsCrossed className="h-8 w-8 text-muted-foreground" />
+                <div className="bg-muted mb-4 rounded-full p-4">
+                  <UtensilsCrossed className="text-muted-foreground h-8 w-8" />
                 </div>
-                <p className="text-lg font-medium text-muted-foreground">
+                <p className="text-muted-foreground text-lg font-medium">
                   Aucune recette ajoutée
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Utilisez le formulaire ci-dessus pour ajouter votre première
                   recette
                 </p>
@@ -435,8 +435,8 @@ export default function AddRecipesForm() {
                   <Card
                     key={recipe.id}
                     className={cn(
-                      "overflow-hidden transition-shadow hover:shadow-md",
-                      { "animate-color-cycle": recipe.sending }
+                      'overflow-hidden transition-shadow hover:shadow-md',
+                      { 'animate-color-cycle': recipe.sending },
                     )}
                   >
                     <CardContent className="p-0">
@@ -451,7 +451,7 @@ export default function AddRecipesForm() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="shrink-0 text-muted-foreground hover:text-primary"
+                                className="text-muted-foreground hover:text-primary shrink-0"
                                 aria-label="Modifier la recette"
                                 onClick={() => handleEdit(recipe)}
                               >
@@ -462,7 +462,7 @@ export default function AddRecipesForm() {
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => deleteRecipe(recipe.id)}
-                                className="shrink-0 text-muted-foreground hover:text-destructive"
+                                className="text-muted-foreground hover:text-destructive shrink-0"
                                 aria-label="Supprimer la recette"
                               >
                                 <Trash2 className="h-4 w-4" />
@@ -471,12 +471,12 @@ export default function AddRecipesForm() {
                           </div>
                           {/* Description optionnelle de la recette */}
                           {recipe.description && (
-                            <p className="mb-3 text-sm text-muted-foreground">
+                            <p className="text-muted-foreground mb-3 text-sm">
                               {recipe.description}
                             </p>
                           )}
                           {/* Informations rapides : temps et personnes */}
-                          <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+                          <div className="text-muted-foreground flex flex-wrap gap-3 text-sm">
                             {recipe.prepTime && (
                               <span className="flex items-center gap-1">
                                 <Clock className="h-4 w-4" />
@@ -489,25 +489,25 @@ export default function AddRecipesForm() {
                                 {recipe.servings}
                               </span>
                             )}
-                          </div>{" "}
+                          </div>{' '}
                           {/* Ingrédients affichés avec saut de ligne conservé */}
                           {recipe.ingredients && (
                             <div className="mt-4">
                               <p className="mb-1 text-sm font-medium">
                                 Ingrédients:
                               </p>
-                              <p className="text-sm whitespace-pre-line text-muted-foreground">
+                              <p className="text-muted-foreground text-sm whitespace-pre-line">
                                 {recipe.ingredients}
                               </p>
                             </div>
-                          )}{" "}
+                          )}{' '}
                           {/* Instructions affichées avec saut de ligne conservé */}
                           {recipe.instructions && (
                             <div className="mt-4">
                               <p className="mb-1 text-sm font-medium">
                                 Instructions:
                               </p>
-                              <p className="text-sm whitespace-pre-line text-muted-foreground">
+                              <p className="text-muted-foreground text-sm whitespace-pre-line">
                                 {recipe.instructions}
                               </p>
                             </div>
@@ -516,12 +516,12 @@ export default function AddRecipesForm() {
                       </div>
                     </CardContent>
                   </Card>
-                )
+                );
               })}
             </div>
           )}
         </section>
       </main>
     </div>
-  )
+  );
 }

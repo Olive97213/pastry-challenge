@@ -18,48 +18,35 @@ export type RecipeActionResponse = {
  * Un ingrédient d'une recette.
  */
 export type RecipeIngredientInput = {
-
   /**
    * Nom de l'ingrédient.
    */
   name: string;
-
 
   /**
    * Quantité numérique.
    */
   quantity?: number;
 
-
   /**
    * Unité :
    * g, ml, cl, pièce...
    */
   unit?: string;
-
 };
-
-
 
 /**
  * Données temporaires conservées
  * pendant le wizard.
  */
 export type RecipeWizardData = {
-
   title?: string;
 
   description?: string;
 
-  difficulty?:
-    | "BEGINNER"
-    | "INTERMEDIATE"
-    | "ADVANCED";
+  difficulty?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 
-
-  ingredients?:
-    RecipeIngredientInput[];
-
+  ingredients?: RecipeIngredientInput[];
 
   instructions?: string;
 
@@ -70,5 +57,4 @@ export type RecipeWizardData = {
   restTime?: number;
 
   servings?: number;
-
 };
