@@ -1,9 +1,15 @@
 "use server";
 
+
 import { auth } from "@/auth";
 
 import { db } from "@/db/client";
-import { recipes } from "@/db/schema";
+
+import {
+  recipes,
+  recipeIngredients,
+} from "@/db/schema";
+
 
 import {
   generateSlug,
@@ -16,17 +22,57 @@ import type {
 
 
 
+type CreateRecipeInput = {
+
+  title: string;
+
+  description?: string;
+
+  difficulty?:
+    | "BEGINNER"
+    | "INTERMEDIATE"
+    | "ADVANCED";
+
+
+  instructions?: string;
+
+
+  prepTime?: number;
+
+  cookTime?: number;
+
+  restTime?: number;
+
+
+  servings?: number;
+
+
+  ingredients?: {
+
+    name: string;
+
+    quantity?: number;
+
+    unit?: string;
+
+  }[];
+
+};
+
+
+
 /**
  * Création d'une recette brouillon.
  *
- * Une recette appartient obligatoirement
- * à l'utilisateur connecté.
+ * Cette action :
+ * - vérifie l'utilisateur connecté
+ * - crée la recette
+ * - ajoute les ingrédients associés
  */
 export async function createRecipe(
-  data: {
-    title: string;
-  }
+  data: CreateRecipeInput
 ): Promise<RecipeActionResponse> {
+
 
 
   /**
@@ -40,10 +86,14 @@ export async function createRecipe(
   if (!session?.user?.id) {
 
     return {
+
       success: false,
+
       message:
-        "Vous devez être connecté",
+        "Utilisateur non connecté",
+
     };
+
   }
 
 
@@ -59,25 +109,104 @@ export async function createRecipe(
 
 
   /**
-   * Création de la recette.
-   *
-   * Le statut DRAFT est appliqué
-   * automatiquement par PostgreSQL.
+   * Insertion de la recette.
    */
-  await db.insert(recipes)
-    .values({
+  const [recipe] =
+    await db
+      .insert(recipes)
+      .values({
 
-      userId:
-        session.user.id,
-
-
-      title:
-        data.title,
+        userId:
+          session.user.id,
 
 
-      slug,
+        title:
+          data.title,
 
-    });
+
+        slug,
+
+
+        description:
+          data.description,
+
+
+        instructions:
+          data.instructions,
+
+
+        prepTime:
+          data.prepTime,
+
+
+        cookTime:
+          data.cookTime,
+
+
+        restTime:
+          data.restTime,
+
+
+        servings:
+          data.servings,
+
+
+        difficulty:
+          data.difficulty,
+
+      })
+      .returning({
+        id: recipes.id,
+      });
+
+
+
+
+  /**
+   * Ajout des ingrédients liés
+   * à la recette.
+   */
+  if (
+    data.ingredients &&
+    data.ingredients.length > 0
+  ) {
+
+
+    await db
+      .insert(recipeIngredients)
+      .values(
+
+        data.ingredients.map(
+          (
+            ingredient,
+            index
+          ) => ({
+
+            recipeId:
+              recipe.id,
+
+
+            name:
+              ingredient.name,
+
+
+            quantity:
+              ingredient.quantity,
+
+
+            unit:
+              ingredient.unit,
+
+
+            position:
+              index,
+
+          })
+        )
+
+      );
+
+  }
 
 
 
@@ -86,7 +215,11 @@ export async function createRecipe(
     success: true,
 
     message:
-      "Brouillon créé",
+      "Recette enregistrée",
+
+    recipeId:
+      recipe.id,
 
   };
+
 }

@@ -10,6 +10,8 @@ export type RecipeActionResponse = {
     field: string;
     message: string;
   }[];
+
+  recipeId?: string;
 };
 
 /**
