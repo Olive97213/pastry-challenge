@@ -38,7 +38,17 @@ export default function StepIngredients({
     setData((previous) => ({
       ...previous,
 
-      ingredients: [...(previous.ingredients ?? []), ingredient],
+      ingredients: [
+        ...(previous.ingredients ?? []),
+
+        {
+          ...ingredient,
+
+          name: ingredient.name.trim(),
+
+          unit: ingredient.unit?.trim(),
+        },
+      ],
     }));
 
     setIngredient({
@@ -78,7 +88,7 @@ export default function StepIngredients({
           setIngredient({
             ...ingredient,
 
-            quantity: Number(e.target.value),
+            quantity: e.target.value ? Number(e.target.value) : undefined,
           })
         }
         placeholder="Quantité"

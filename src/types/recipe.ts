@@ -58,3 +58,33 @@ export type RecipeWizardData = {
 
   servings?: number;
 };
+
+/**
+ * Données nécessaires pour créer
+ * une recette en base.
+ *
+ * À ce stade du processus,
+ * les champs obligatoires ont été validés.
+ */
+export type CreateRecipeInput = {
+  /**
+   * Nom obligatoire de la recette.
+   */
+  title: string;
+
+  description?: string;
+
+  difficulty?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+
+  instructions?: string;
+
+  prepTime?: number;
+
+  cookTime?: number;
+
+  restTime?: number;
+
+  servings?: number;
+
+  ingredients?: RecipeIngredientInput[];
+};

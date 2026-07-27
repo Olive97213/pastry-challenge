@@ -31,4 +31,10 @@ export const recipeInformationSchema = z.object({
     .default('BEGINNER'),
 });
 
-export type RecipeInformationInput = z.infer<typeof recipeInformationSchema>;
+/**
+ * Type utilisé par React Hook Form.
+ *
+ * On utilise input car il correspond
+ * aux données avant validation.
+ */
+export type RecipeInformationInput = z.input<typeof recipeInformationSchema>;

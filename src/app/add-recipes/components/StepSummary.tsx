@@ -8,13 +8,13 @@ import type { RecipeWizardData } from '@/types/recipe';
 
 type Props = {
   /**
-   * Données complètes collectées
-   * durant les différentes étapes du wizard.
+   * Données collectées pendant
+   * les différentes étapes du wizard.
    */
   data: RecipeWizardData;
 
   /**
-   * Retour à l'étape précédente.
+   * Retour vers l'étape précédente.
    */
   onBack: () => void;
 };
@@ -24,19 +24,16 @@ type Props = {
  *
  * Cette étape permet :
  * - de vérifier les informations saisies
- * - d'enregistrer la recette en base
+ * - d'envoyer la recette au serveur
  */
 export default function StepSummary({ data, onBack }: Props) {
   /**
-   * État du bouton d'enregistrement.
-   *
-   * Permet d'éviter plusieurs insertions
-   * simultanées.
+   * État du bouton de sauvegarde.
    */
   const [isLoading, setIsLoading] = useState(false);
 
   /**
-   * Message affiché après sauvegarde.
+   * Message de retour utilisateur.
    */
   const [message, setMessage] = useState<string | null>(null);
 
@@ -45,12 +42,34 @@ export default function StepSummary({ data, onBack }: Props) {
    * de la recette.
    */
   async function saveRecipe() {
+    /**
+     * Vérification minimale
+     * avant envoi serveur.
+     *
+     * Le titre est obligatoire
+     * dans la base de données.
+     */
+    if (!data.title) {
+      setMessage('Le titre de la recette est obligatoire');
+
+      return;
+    }
+
     try {
       setIsLoading(true);
 
       setMessage(null);
 
-      const result = await createRecipe(data);
+      /**
+       * On reconstruit l'objet envoyé
+       * afin de garantir les types attendus
+       * par createRecipe().
+       */
+      const result = await createRecipe({
+        ...data,
+
+        title: data.title,
+      });
 
       if (!result.success) {
         setMessage(result.message);
@@ -62,7 +81,7 @@ export default function StepSummary({ data, onBack }: Props) {
     } catch (error) {
       console.error('Erreur création recette :', error);
 
-      setMessage('Une erreur est survenue');
+      setMessage("Une erreur est survenue lors de l'enregistrement");
     } finally {
       setIsLoading(false);
     }
@@ -97,9 +116,9 @@ export default function StepSummary({ data, onBack }: Props) {
           <ul>
             {data.ingredients.map((ingredient, index) => (
               <li key={index}>
-                {ingredient.name}
-                {' - '}
-                {ingredient.quantity} {ingredient.unit}
+                {ingredient.name}{' '}
+                {ingredient.quantity && `${ingredient.quantity} `}
+                {ingredient.unit}
               </li>
             ))}
           </ul>

@@ -8,33 +8,7 @@ import { recipes, recipeIngredients } from '@/db/schema';
 
 import { generateSlug } from '@/lib/slug';
 
-import type { RecipeActionResponse } from '@/types/recipe';
-
-type CreateRecipeInput = {
-  title: string;
-
-  description?: string;
-
-  difficulty?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
-
-  instructions?: string;
-
-  prepTime?: number;
-
-  cookTime?: number;
-
-  restTime?: number;
-
-  servings?: number;
-
-  ingredients?: {
-    name: string;
-
-    quantity?: number;
-
-    unit?: string;
-  }[];
-};
+import type { CreateRecipeInput, RecipeActionResponse } from '@/types/recipe';
 
 /**
  * Création d'une recette brouillon.

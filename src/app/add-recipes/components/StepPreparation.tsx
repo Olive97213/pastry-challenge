@@ -84,11 +84,9 @@ export default function StepPreparation({
 
       <input
         type="number"
-        placeholder="
-        Temps préparation (minutes)
-        "
+        placeholder="Temps préparation (minutes)"
         {...register('prepTime', {
-          valueAsNumber: true,
+          setValueAs: (value) => (value === '' ? undefined : Number(value)),
         })}
       />
 
