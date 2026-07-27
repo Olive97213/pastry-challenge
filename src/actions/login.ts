@@ -1,40 +1,96 @@
 "use server";
 
-import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
 
+import { signIn } from "@/auth";
 
+import type {
+  ActionResponse,
+} from "@/types/auth";
+
+
+/**
+ * Authentifie un utilisateur avec Auth.js.
+ *
+ * Le contrôle du mot de passe est effectué
+ * dans le provider Credentials de auth.ts.
+ */
 export async function loginUser(
   formData: FormData
-) {
-
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+): Promise<ActionResponse> {
 
 
-try {
-  await signIn("credentials", {
-    email,
-    password,
-    redirectTo: "/",
-  });
+  /**
+   * Récupération sécurisée des données du formulaire.
+   */
+  const email =
+    formData.get("email");
 
-  console.log("LOGIN SUCCESS");
+  const password =
+    formData.get("password");
 
-} catch (error) {
 
+
+  if (
+    typeof email !== "string" ||
+    typeof password !== "string"
+  ) {
+
+    return {
+      success: false,
+      message: "Données invalides",
+    };
+  }
+
+
+
+  try {
+
+    /**
+     * Authentification via Auth.js.
+     *
+     * redirectTo permet de rediriger
+     * après une connexion réussie.
+     */
+    await signIn(
+      "credentials",
+      {
+        email,
+        password,
+        redirectTo: "/",
+      }
+    );
+
+
+  } catch (error) {
+
+
+    /**
+     * Erreur générée par Auth.js
+     * lorsque les identifiants sont incorrects.
+     */
     if (error instanceof AuthError) {
+
       return {
         success: false,
-        message: "Email ou mot de passe incorrect",
+        message:
+          "Email ou mot de passe incorrect",
       };
     }
 
+
+    /**
+     * Les autres erreurs doivent remonter
+     * pour être traitées comme erreurs serveur.
+     */
     throw error;
   }
 
 
+
   return {
     success: true,
+    message:
+      "Connexion réussie",
   };
 }
