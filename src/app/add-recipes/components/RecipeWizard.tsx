@@ -4,6 +4,9 @@
 import {
   useState,
 } from "react";
+import type {
+  RecipeWizardData,
+} from "@/types/recipe";
 
 
 import StepInformation from "./StepInformation";
@@ -33,7 +36,7 @@ export default function RecipeWizard() {
    * conservées pendant le wizard.
    */
   const [recipeData, setRecipeData] =
-    useState({});
+  useState<RecipeWizardData>({});
 
 
 
