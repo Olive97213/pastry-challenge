@@ -3,6 +3,8 @@
 import { useState } from 'react';
 
 import type { RecipeIngredientInput, RecipeWizardData } from '@/types/recipe';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 type Props = {
   data: RecipeWizardData;
@@ -29,27 +31,40 @@ export default function StepIngredients({
     quantity: undefined,
     unit: '',
   });
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
   function addIngredient() {
     if (!ingredient.name.trim()) {
       return;
     }
 
-    setData((previous) => ({
-      ...previous,
-
-      ingredients: [
-        ...(previous.ingredients ?? []),
-
-        {
-          ...ingredient,
-
-          name: ingredient.name.trim(),
-
-          unit: ingredient.unit?.trim(),
-        },
-      ],
-    }));
+    if (editingIndex !== null) {
+      setData((previous) => ({
+        ...previous,
+        ingredients: previous.ingredients?.map((item, index) =>
+          index === editingIndex
+            ? {
+                ...ingredient,
+                name: ingredient.name.trim(),
+                unit: ingredient.unit?.trim(),
+              }
+            : item,
+        ),
+      }));
+      setEditingIndex(null);
+    } else {
+      setData((previous) => ({
+        ...previous,
+        ingredients: [
+          ...(previous.ingredients ?? []),
+          {
+            ...ingredient,
+            name: ingredient.name.trim(),
+            unit: ingredient.unit?.trim(),
+          },
+        ],
+      }));
+    }
 
     setIngredient({
       name: '',
@@ -61,73 +76,144 @@ export default function StepIngredients({
   function removeIngredient(index: number) {
     setData((previous) => ({
       ...previous,
-
       ingredients: previous.ingredients?.filter((_, i) => i !== index),
     }));
+
+    if (editingIndex === index) {
+      setEditingIndex(null);
+      setIngredient({ name: '', quantity: undefined, unit: '' });
+    }
+  }
+
+  function editIngredient(index: number) {
+    const ingredientToEdit = data.ingredients?.[index];
+
+    if (!ingredientToEdit) {
+      return;
+    }
+
+    setIngredient({
+      name: ingredientToEdit.name,
+      quantity: ingredientToEdit.quantity,
+      unit: ingredientToEdit.unit ?? '',
+    });
+    setEditingIndex(index);
   }
 
   return (
-    <div>
-      <h2>Ingrédients</h2>
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <h2 className="text-xl font-semibold">Ingrédients</h2>
+        <p className="text-muted-foreground text-sm">
+          Ajoute les ingrédients un par un et choisis leur quantité.
+        </p>
+      </div>
 
-      <input
-        value={ingredient.name}
-        onChange={(e) =>
-          setIngredient({
-            ...ingredient,
-            name: e.target.value,
-          })
-        }
-        placeholder="Farine"
-      />
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Input
+          value={ingredient.name}
+          onChange={(e) =>
+            setIngredient({
+              ...ingredient,
+              name: e.target.value,
+            })
+          }
+          placeholder="Farine"
+        />
+        <Input
+          type="number"
+          value={ingredient.quantity ?? ''}
+          onChange={(e) =>
+            setIngredient({
+              ...ingredient,
+              quantity: e.target.value ? Number(e.target.value) : undefined,
+            })
+          }
+          placeholder="Quantité"
+        />
+        <Input
+          value={ingredient.unit}
+          onChange={(e) =>
+            setIngredient({
+              ...ingredient,
+              unit: e.target.value,
+            })
+          }
+          placeholder="g, ml..."
+        />
+      </div>
 
-      <input
-        type="number"
-        value={ingredient.quantity ?? ''}
-        onChange={(e) =>
-          setIngredient({
-            ...ingredient,
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <Button
+          type="button"
+          className="w-full sm:w-fit"
+          onClick={addIngredient}
+        >
+          {editingIndex !== null ? 'Mettre à jour' : 'Ajouter l’ingrédient'}
+        </Button>
+        {editingIndex !== null && (
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full sm:w-fit"
+            onClick={() => {
+              setEditingIndex(null);
+              setIngredient({ name: '', quantity: undefined, unit: '' });
+            }}
+          >
+            Annuler
+          </Button>
+        )}
+      </div>
 
-            quantity: e.target.value ? Number(e.target.value) : undefined,
-          })
-        }
-        placeholder="Quantité"
-      />
+      <div className="border-border/70 bg-background/70 space-y-3 rounded-lg border p-4">
+        {data.ingredients?.length ? (
+          data.ingredients.map((item, index) => (
+            <div
+              key={index}
+              className="border-border/70 bg-muted/70 flex items-center justify-between gap-4 rounded-md border p-3"
+            >
+              <div>
+                <p className="font-medium">{item.name}</p>
+                <p className="text-muted-foreground text-sm">
+                  {item.quantity ?? ''} {item.unit}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => editIngredient(index)}
+                >
+                  Modifier
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => removeIngredient(index)}
+                >
+                  Supprimer
+                </Button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="text-muted-foreground text-sm">
+            Aucun ingrédient ajouté.
+          </p>
+        )}
+      </div>
 
-      <input
-        value={ingredient.unit}
-        onChange={(e) =>
-          setIngredient({
-            ...ingredient,
-
-            unit: e.target.value,
-          })
-        }
-        placeholder="g, ml..."
-      />
-
-      <button type="button" onClick={addIngredient}>
-        Ajouter
-      </button>
-
-      <ul>
-        {data.ingredients?.map((item, index) => (
-          <li key={index}>
-            {item.name} {item.quantity} {item.unit}
-            <button type="button" onClick={() => removeIngredient(index)}>
-              Supprimer
-            </button>
-          </li>
-        ))}
-      </ul>
-
-      <button type="button" onClick={onBack}>
-        Retour
-      </button>
-
-      <button type="button" onClick={onNext}>
-        Continuer
-      </button>
+      <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+        <Button type="button" variant="outline" onClick={onBack}>
+          Retour
+        </Button>
+        <Button type="button" onClick={onNext}>
+          Continuer
+        </Button>
+      </div>
     </div>
   );
 }
