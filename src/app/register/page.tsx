@@ -7,7 +7,7 @@ import { UserPlus } from 'lucide-react';
 
 import { registerSchema, type RegisterInput } from '@/schemas/auth.schema';
 
-import { registerUser } from '@/actions/register';
+import { registerUser } from '@/actions/auth/register';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { LogIn } from 'lucide-react';
 
-import { loginUser } from '@/actions/login';
+import { loginUser } from '@/actions/auth/login';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
