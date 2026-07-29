@@ -88,3 +88,14 @@ export type CreateRecipeInput = {
 
   ingredients?: RecipeIngredientInput[];
 };
+
+/**
+ * Données nécessaires pour mettre à jour
+ * une recette existante.
+ */
+export type UpdateRecipeInput = CreateRecipeInput & {
+  /**
+   * Identifiant de la recette à modifier.
+   */
+  id: string;
+};

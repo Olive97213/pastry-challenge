@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 /**
  * État vide.
@@ -8,12 +9,20 @@ import Link from 'next/link';
  */
 export default function EmptyState() {
   return (
-    <section>
-      <h1>Mes recettes</h1>
+    <div className="py-6 text-center">
+      <h3 className="text-lg font-medium">
+        Aucune recette pour l&apos;instant
+      </h3>
+      <p className="text-muted-foreground mt-2 text-sm">
+        Tu n&apos;as encore créé aucune recette. Commence en ajoutant ta
+        première recette.
+      </p>
 
-      <p>Vous n'avez encore créé aucune recette.</p>
-
-      <Link href="/add-recipes">Créer ma première recette</Link>
-    </section>
+      <div className="mt-4">
+        <Button asChild>
+          <Link href="/add-recipes">Créer ma première recette</Link>
+        </Button>
+      </div>
+    </div>
   );
 }

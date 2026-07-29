@@ -1,5 +1,4 @@
 import type { Recipe } from '@/db/schema';
-
 import RecipeCard from './RecipeCard';
 
 type Props = {
@@ -12,11 +11,11 @@ type Props = {
 export default function RecipeList({ recipes }: Props) {
   return (
     <section>
-      <h1>Mes recettes</h1>
-
-      {recipes.map((recipe) => (
-        <RecipeCard key={recipe.id} recipe={recipe} />
-      ))}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {recipes.map((recipe) => (
+          <RecipeCard key={recipe.id} recipe={recipe} />
+        ))}
+      </div>
     </section>
   );
 }
