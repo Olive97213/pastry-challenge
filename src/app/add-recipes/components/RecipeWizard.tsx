@@ -1,73 +1,111 @@
 'use client';
 
+import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
+import Link from 'next/link';
+
 import type { RecipeWizardData } from '@/types/recipe';
 
+import { Button } from '@/components/ui/button';
 import StepInformation from './StepInformation';
 import StepIngredients from './StepIngredients';
 import StepPreparation from './StepPreparation';
 import StepSummary from './StepSummary';
 
+type Props = {
+  /**
+   * Données initiales du wizard.
+   */
+  initialData?: RecipeWizardData;
+
+  /**
+   * Mode de fonctionnement.
+   */
+  mode?: 'create' | 'edit';
+
+  /**
+   * Identifiant de la recette.
+   *
+   * Utilisé uniquement
+   * lors de l'édition.
+   */
+  recipeId?: string;
+};
+
 /**
- * Gestionnaire principal
- * du parcours de création d'une recette.
- */
-export default function RecipeWizard() {
-  /**
-   * Étape actuellement affichée.
-   */
-  const [currentStep, setCurrentStep] = useState(1);
 
+* Wizard de création et de modification
+* d'une recette.
+  */
+export default function RecipeWizard({
+  initialData,
+  mode = 'create',
+  recipeId,
+}: Props) {
   /**
-   * Données temporaires
-   * conservées pendant le wizard.
+   * Étape actuelle du wizard.
    */
-  const [recipeData, setRecipeData] = useState<RecipeWizardData>({});
+  const [step, setStep] = useState(1);
+  /**
 
-  /**
-   * Passage à l'étape suivante.
-   */
+* État global du wizard.
+*
+* Lors d'une création, il démarre vide.
+* Lors d'une édition, il est prérempli
+* avec les données de la recette.
+  */
+  const [data, setData] = useState<RecipeWizardData>(initialData ?? {});
+
   function nextStep() {
-    setCurrentStep((step) => step + 1);
+    setStep((previous) => previous + 1);
   }
 
-  /**
-   * Retour à l'étape précédente.
-   */
   function previousStep() {
-    setCurrentStep((step) => step - 1);
+    setStep((previous) => previous - 1);
   }
 
   return (
-    <div>
-      {currentStep === 1 && (
-        <StepInformation
-          data={recipeData}
-          setData={setRecipeData}
-          onNext={nextStep}
-        />
+    <div className="space-y-4">
+      {mode === 'edit' && (
+        <Button asChild variant="outline" className="w-fit">
+          <Link href="/dashboard/recipes">
+            <span className="flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Retour
+            </span>
+          </Link>
+        </Button>
       )}
 
-      {currentStep === 2 && (
+      {step === 1 && (
+        <StepInformation data={data} setData={setData} onNext={nextStep} />
+      )}
+
+      {step === 2 && (
         <StepIngredients
-          data={recipeData}
-          setData={setRecipeData}
+          data={data}
+          setData={setData}
           onNext={nextStep}
           onBack={previousStep}
         />
       )}
 
-      {currentStep === 3 && (
+      {step === 3 && (
         <StepPreparation
-          data={recipeData}
-          setData={setRecipeData}
+          data={data}
+          setData={setData}
           onNext={nextStep}
           onBack={previousStep}
         />
       )}
 
-      {currentStep === 4 && (
-        <StepSummary data={recipeData} onBack={previousStep} />
+      {step === 4 && (
+        <StepSummary
+          data={data}
+          onBack={previousStep}
+          mode={mode}
+          recipeId={recipeId}
+        />
       )}
     </div>
   );

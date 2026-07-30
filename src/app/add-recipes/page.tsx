@@ -17,7 +17,7 @@ export default function AddRecipePage() {
             </p>
           </CardHeader>
           <CardContent className="px-4 py-6 sm:px-6">
-            <RecipeWizard />
+            <RecipeWizard mode="create" />
           </CardContent>
         </Card>
       </div>

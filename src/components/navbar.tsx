@@ -18,7 +18,7 @@ export function Navbar() {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const navLinks = [
-    { href: '/my-recipes', label: 'Mes Recettes', icon: BookOpen },
+    { href: '/dashboard/recipes', label: 'Mes Recettes', icon: BookOpen },
     { href: '/add-recipes', label: 'Ajouter Recette', icon: PlusCircle },
     { href: '/account', label: 'Mon compte', icon: UserCircle2 },
   ];

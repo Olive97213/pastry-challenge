@@ -1,6 +1,8 @@
 import type { Recipe } from '@/db/schema';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import DeleteRecipeButton from './DeleteRecipeButton';
+import EditRecipeButton from './EditRecipeButton';
 
 type Props = {
   recipe: Recipe;
@@ -27,12 +29,8 @@ export default function RecipeCard({ recipe }: Props) {
           </div>
 
           <div className="flex gap-2">
-            <Button type="button" variant="outline" size="sm">
-              Modifier
-            </Button>
-            <Button type="button" variant="destructive" size="sm">
-              Supprimer
-            </Button>
+            <EditRecipeButton recipeId={recipe.id} />
+            <DeleteRecipeButton recipeId={recipe.id} />
           </div>
         </div>
       </CardContent>

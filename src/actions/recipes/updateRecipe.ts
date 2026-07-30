@@ -34,7 +34,7 @@ export async function updateRecipe(
       message: 'Utilisateur non connecté',
     };
   }
-
+  const userId = session.user.id;
   try {
     /**
      * Toutes les opérations sont regroupées
@@ -69,9 +69,7 @@ export async function updateRecipe(
 
           updatedAt: new Date(),
         })
-        .where(
-          and(eq(recipes.id, data.id), eq(recipes.userId, session.user.id)),
-        )
+        .where(and(eq(recipes.id, data.id), eq(recipes.userId, userId)))
         .returning({
           id: recipes.id,
         });

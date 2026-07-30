@@ -5,7 +5,14 @@ import Link from 'next/link';
 import EmptyState from './components/EmptyState';
 import RecipeList from './components/RecipeList';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 /**
  * Tableau de bord des recettes.
@@ -20,12 +27,15 @@ export default async function DashboardRecipesPage() {
     <main className="from-primary/10 via-background to-secondary/10 min-h-screen bg-linear-to-br px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
         <Card className="border-border/60 shadow-sm">
-          <CardHeader className="flex items-center justify-between">
+          <CardHeader className="items-center gap-4 px-4 py-4 sm:px-6">
             <div>
               <CardTitle className="text-2xl">Mes recettes</CardTitle>
+              <CardDescription>
+                Retrouve toutes tes recettes et modifie-les ou supprime-les en
+                un clic.
+              </CardDescription>
             </div>
-
-            <div>
+            <CardAction>
               <Button asChild>
                 <Link href="/add-recipes">
                   <span className="flex items-center gap-2">
@@ -34,10 +44,10 @@ export default async function DashboardRecipesPage() {
                   </span>
                 </Link>
               </Button>
-            </div>
+            </CardAction>
           </CardHeader>
 
-          <CardContent>
+          <CardContent className="space-y-6 px-4 py-6 sm:px-6">
             {recipes.length === 0 ? (
               <EmptyState />
             ) : (
