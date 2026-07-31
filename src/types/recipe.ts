@@ -44,6 +44,8 @@ export type RecipeWizardData = {
 
   description?: string;
 
+  image?: string;
+
   difficulty?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 
   ingredients?: RecipeIngredientInput[];
@@ -73,6 +75,8 @@ export type CreateRecipeInput = {
   title: string;
 
   description?: string;
+
+  image?: string;
 
   difficulty?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 

@@ -1,3 +1,5 @@
+'use server';
+
 import { randomUUID } from 'crypto';
 
 import cloudinary from '@/lib/cloudinary';

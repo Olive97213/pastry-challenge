@@ -51,6 +51,8 @@ export async function createRecipe(
 
       slug,
 
+      image: data.image,
+
       description: data.description,
 
       instructions: data.instructions,
