@@ -32,15 +32,7 @@ export async function uploadRecipeImage(file: File): Promise<string> {
 
           resource_type: 'image',
 
-          transformation: [
-            ...RECIPE_IMAGE_TRANSFORMATION,
-
-            {
-              fetch_format: 'auto',
-
-              quality: 'auto',
-            },
-          ],
+          transformation: [...RECIPE_IMAGE_TRANSFORMATION],
         },
 
         (error, result) => {
