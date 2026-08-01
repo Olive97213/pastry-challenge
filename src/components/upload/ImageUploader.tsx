@@ -6,7 +6,7 @@ import ImagePreview from './ImagePreview';
 import UploadDropzone from './UploadDropzone';
 import UploadSpinner from './UploadSpinner';
 
-import { uploadImage } from '@/lib/upload';
+import { uploadImage } from '@/lib/upload/client';
 
 type Props = {
   id?: string;

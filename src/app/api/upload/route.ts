@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
-
 import { auth } from '@/auth';
-
-import { uploadRecipeImage, validateImage } from '@/lib/upload';
+import { validateImage } from '@/lib/upload';
+import { uploadRecipeImage } from '@/lib/upload/server';
 
 /**
  * Upload d'une image

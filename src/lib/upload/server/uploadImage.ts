@@ -4,7 +4,10 @@ import { randomUUID } from 'crypto';
 
 import cloudinary from '@/lib/cloudinary';
 
-import { RECIPE_IMAGES_FOLDER, RECIPE_IMAGE_TRANSFORMATION } from './constants';
+import {
+  RECIPE_IMAGES_FOLDER,
+  RECIPE_IMAGE_TRANSFORMATION,
+} from '../constants';
 
 /**
  * Envoie une image
@@ -29,9 +32,15 @@ export async function uploadRecipeImage(file: File): Promise<string> {
 
           resource_type: 'image',
 
-          format: 'webp',
+          transformation: [
+            ...RECIPE_IMAGE_TRANSFORMATION,
 
-          transformation: RECIPE_IMAGE_TRANSFORMATION,
+            {
+              fetch_format: 'auto',
+
+              quality: 'auto',
+            },
+          ],
         },
 
         (error, result) => {
