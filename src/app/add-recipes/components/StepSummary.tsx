@@ -6,9 +6,8 @@ import { useRouter } from 'next/navigation';
 
 import { createRecipe } from '@/actions/recipes/createRecipe';
 import { updateRecipe } from '@/actions/recipes/updateRecipe';
-
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-
 import type { RecipeWizardData, UpdateRecipeInput } from '@/types/recipe';
 
 type Props = {
@@ -53,14 +52,12 @@ export default function StepSummary({ data, onBack, mode, recipeId }: Props) {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const [message, setMessage] = useState<string | null>(null);
-
   async function saveRecipe() {
     /**
      * Vérification minimale avant envoi.
      */
     if (!data.title) {
-      setMessage('Le titre de la recette est obligatoire');
+      toast.error('Le titre de la recette est obligatoire');
       return;
     }
 
@@ -69,14 +66,12 @@ export default function StepSummary({ data, onBack, mode, recipeId }: Props) {
      * l'identifiant est obligatoire.
      */
     if (mode === 'edit' && !recipeId) {
-      setMessage('Identifiant de recette manquant');
+      toast.error('Identifiant de recette manquant');
       return;
     }
 
     try {
       setIsLoading(true);
-
-      setMessage(null);
 
       let result;
 
@@ -90,10 +85,9 @@ export default function StepSummary({ data, onBack, mode, recipeId }: Props) {
           title: data.title,
         });
       } else {
-
-      /**
-       * Modification d'une recette existante.
-       */
+        /**
+         * Modification d'une recette existante.
+         */
         const updateData: UpdateRecipeInput = {
           ...data,
 
@@ -106,23 +100,25 @@ export default function StepSummary({ data, onBack, mode, recipeId }: Props) {
       }
 
       if (!result.success) {
-        setMessage(result.message);
+        toast.error(result.message);
         return;
       }
 
-      setMessage(result.message);
+      toast.success(result.message);
 
       /**
        * Retour vers la liste
        * après quelques instants.
        */
+      const REDIRECT_DELAY = 1000;
+
       setTimeout(() => {
         router.push('/dashboard/recipes');
-      }, 1000);
+      }, REDIRECT_DELAY);
     } catch (error) {
       console.error('Erreur enregistrement recette :', error);
 
-      setMessage("Une erreur est survenue lors de l'enregistrement");
+      toast.error("Une erreur est survenue lors de l'enregistrement");
     } finally {
       setIsLoading(false);
     }
@@ -195,11 +191,7 @@ export default function StepSummary({ data, onBack, mode, recipeId }: Props) {
         </div>
       </section>
 
-      {message && (
-        <div className="border-border/70 bg-background/70 text-muted-foreground rounded-md border px-4 py-3 text-sm">
-          {message}
-        </div>
-      )}
+      <div className="border-border/70 bg-background/70 text-muted-foreground rounded-md border px-4 py-3 text-sm"></div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
         <Button

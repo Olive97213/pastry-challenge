@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-
 import { useRouter } from 'next/navigation';
 
 import { deleteRecipe } from '@/actions/recipes/deleteRecipe';
 
 import { Button } from '@/components/ui/button';
+
+import { toast } from 'sonner';
 
 import {
   AlertDialog,
@@ -24,6 +25,10 @@ type Props = {
   recipeId: string;
 };
 
+/**
+ * Bouton de suppression
+ * d'une recette.
+ */
 export default function DeleteRecipeButton({ recipeId }: Props) {
   const router = useRouter();
 
@@ -36,15 +41,18 @@ export default function DeleteRecipeButton({ recipeId }: Props) {
       const result = await deleteRecipe(recipeId);
 
       if (!result.success) {
-        alert(result.message);
+        toast.error(result.message);
+
         return;
       }
 
+      toast.success(result.message);
+
       router.refresh();
     } catch (error) {
-      console.error(error);
+      console.error('Erreur suppression recette :', error);
 
-      alert('Une erreur est survenue.');
+      toast.error('Une erreur est survenue lors de la suppression.');
     } finally {
       setIsLoading(false);
     }
@@ -67,7 +75,7 @@ export default function DeleteRecipeButton({ recipeId }: Props) {
         </AlertDialogHeader>
 
         <AlertDialogFooter>
-          <AlertDialogCancel>Annuler</AlertDialogCancel>
+          <AlertDialogCancel disabled={isLoading}>Annuler</AlertDialogCancel>
 
           <AlertDialogAction onClick={handleDelete} disabled={isLoading}>
             {isLoading ? 'Suppression...' : 'Supprimer'}

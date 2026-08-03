@@ -5,7 +5,7 @@ import { useState } from 'react';
 import ImagePreview from './ImagePreview';
 import UploadDropzone from './UploadDropzone';
 import UploadSpinner from './UploadSpinner';
-
+import { toast } from 'sonner';
 import { uploadImage } from '@/lib/upload/client';
 
 type Props = {
@@ -28,16 +28,16 @@ export default function ImageUploader({ value, onChange }: Props) {
       const result = await uploadImage(file);
 
       if (!result.success) {
-        alert(result.message);
+        toast.error(result.message);
 
         return;
       }
 
       onChange(result.url);
     } catch (error) {
-      console.error(error);
+      console.error('Erreur upload image :', error);
 
-      alert("Erreur lors de l'upload.");
+      toast.error("Une erreur est survenue pendant l'envoi de l'image.");
     } finally {
       setIsUploading(false);
     }

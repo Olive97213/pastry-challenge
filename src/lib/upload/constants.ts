@@ -15,6 +15,14 @@ export const ALLOWED_IMAGE_TYPES = [
 ] as const;
 
 /**
+ * Configuration utilisée
+ * par react-dropzone.
+ */
+export const DROPZONE_ACCEPT = Object.fromEntries(
+  ALLOWED_IMAGE_TYPES.map((type) => [type, []]),
+) as Record<(typeof ALLOWED_IMAGE_TYPES)[number], []>;
+
+/**
  * Dossier Cloudinary
  * des recettes.
  */
