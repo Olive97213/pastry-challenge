@@ -1,8 +1,9 @@
 import type { Recipe } from '@/db/schema';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import DeleteRecipeButton from './DeleteRecipeButton';
 import EditRecipeButton from './EditRecipeButton';
+import GetRecipeButton from './GetRecipeButton';
+import Image from 'next/image';
 
 type Props = {
   recipe: Recipe;
@@ -14,6 +15,17 @@ type Props = {
 export default function RecipeCard({ recipe }: Props) {
   return (
     <Card className="overflow-hidden">
+      {recipe.image && (
+        <div className="relative aspect-video">
+          <Image
+            src={recipe.image}
+            alt={recipe.title}
+            fill
+            sizes="(max-width: 768px) 100vw, 400px"
+            className="object-cover"
+          />
+        </div>
+      )}
       <CardHeader>
         <CardTitle className="text-base">{recipe.title}</CardTitle>
       </CardHeader>
@@ -28,7 +40,8 @@ export default function RecipeCard({ recipe }: Props) {
             <div>Créée le {recipe.createdAt.toLocaleDateString('fr-FR')}</div>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <GetRecipeButton slug={recipe.slug} />
             <EditRecipeButton recipeId={recipe.id} />
             <DeleteRecipeButton recipeId={recipe.id} />
           </div>
