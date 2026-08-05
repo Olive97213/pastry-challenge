@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { UserPlus } from 'lucide-react';
@@ -12,7 +13,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 
-export function RegisterForm() {
+type RegisterFormProps = {
+  callbackUrl?: string;
+};
+
+export function RegisterForm({ callbackUrl }: RegisterFormProps) {
   const [feedback, setFeedback] = useState<{
     type: 'success' | 'error';
     message: string;
@@ -31,7 +36,7 @@ export function RegisterForm() {
   async function onSubmit(data: RegisterInput) {
     setFeedback(null);
 
-    const result = await registerUser(data);
+    const result = await registerUser(data, callbackUrl);
 
     if (result.success) {
       reset({ username: '', email: '', password: '', confirmPassword: '' });
@@ -142,10 +147,13 @@ export function RegisterForm() {
 }
 
 export default function RegisterPage() {
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') ?? undefined;
+
   return (
     <main className="from-primary/10 via-background to-secondary/10 min-h-screen bg-linear-to-br px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-2xl items-center justify-center">
-        <RegisterForm />
+        <RegisterForm callbackUrl={callbackUrl} />
       </div>
     </main>
   );

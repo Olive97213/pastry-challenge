@@ -22,7 +22,7 @@ export default async function Home() {
     })),
   ];
   return (
-    <div className="from-primary/10 via-background to-secondary/10 min-h-screen bg-gradient-to-br">
+    <div className="from-primary/10 via-background to-secondary/10 min-h-screen bg-linear-to-br">
       <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         {/* En-tête de la page */}
         <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">

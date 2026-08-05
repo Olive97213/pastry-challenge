@@ -11,7 +11,7 @@ export default async function Page() {
   const recipes = await getRecipesAction();
   return (
     // Structure principale de la page avec un fond dégradé et des marges responsives
-    <main className="from-primary/10 via-background to-secondary/10 min-h-screen bg-gradient-to-br px-2 py-10 sm:px-6 lg:px-12">
+    <main className="from-primary/10 via-background to-secondary/10 min-h-screen bg-linear-to-br px-2 py-10 sm:px-6 lg:px-12">
       <div className="mx-auto max-w-6xl">
         {/* En-tête de la page avec icône, titre et description */}
         <div className="mb-10 flex flex-col items-center text-center">

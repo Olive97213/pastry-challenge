@@ -1,15 +1,35 @@
 'use server';
 
+import { AuthError } from 'next-auth';
 import { eq, or } from 'drizzle-orm';
 
 import { db } from '@/db/client';
 import { users } from '@/db/schema';
+import { signIn } from '@/auth';
 
 import { registerSchema, type RegisterInput } from '@/schemas/auth.schema';
 
 import { hashPassword } from '@/lib/password';
 
 import type { ActionResponse } from '@/types/auth';
+
+function normalizeCallbackUrl(callbackUrl?: string | null): string {
+  if (typeof callbackUrl !== 'string' || callbackUrl.trim() === '') {
+    return '/';
+  }
+
+  const sanitized = callbackUrl.trim();
+
+  if (
+    sanitized.startsWith('http://') ||
+    sanitized.startsWith('https://') ||
+    sanitized.startsWith('//')
+  ) {
+    return '/';
+  }
+
+  return sanitized.startsWith('/') ? sanitized : `/${sanitized}`;
+}
 
 /**
  * Création d'un nouveau compte utilisateur.
@@ -22,6 +42,7 @@ import type { ActionResponse } from '@/types/auth';
  */
 export async function registerUser(
   data: RegisterInput,
+  callbackUrl?: string,
 ): Promise<ActionResponse> {
   /**
    * Validation des données reçues.
@@ -84,6 +105,23 @@ export async function registerUser(
 
     passwordHash,
   });
+
+  try {
+    await signIn('credentials', {
+      email,
+      password,
+      redirectTo: normalizeCallbackUrl(callbackUrl),
+    });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return {
+        success: false,
+        message: 'Compte créé, mais la connexion automatique a échoué',
+      };
+    }
+
+    throw error;
+  }
 
   return {
     success: true,

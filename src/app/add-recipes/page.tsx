@@ -1,10 +1,18 @@
+import { auth } from '@/auth';
 import RecipeWizard from './components/RecipeWizard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { redirect } from 'next/navigation';
 
 /**
  * Page de création de recette.
  */
 export default async function AddRecipePage() {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    redirect('/auth-required?from=add-recipes');
+  }
+
   return (
     <main className="from-primary/10 via-background to-secondary/10 min-h-screen bg-linear-to-br px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">

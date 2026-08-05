@@ -6,6 +6,24 @@ import { signIn } from '@/auth';
 
 import type { ActionResponse } from '@/types/auth';
 
+function normalizeCallbackUrl(callbackUrl?: string | null): string {
+  if (typeof callbackUrl !== 'string' || callbackUrl.trim() === '') {
+    return '/';
+  }
+
+  const sanitized = callbackUrl.trim();
+
+  if (
+    sanitized.startsWith('http://') ||
+    sanitized.startsWith('https://') ||
+    sanitized.startsWith('//')
+  ) {
+    return '/';
+  }
+
+  return sanitized.startsWith('/') ? sanitized : `/${sanitized}`;
+}
+
 /**
  * Authentifie un utilisateur avec Auth.js.
  *
@@ -19,6 +37,12 @@ export async function loginUser(formData: FormData): Promise<ActionResponse> {
   const email = formData.get('email');
 
   const password = formData.get('password');
+
+  const callbackValue = formData.get('callbackUrl');
+
+  const callbackUrl = normalizeCallbackUrl(
+    callbackValue instanceof File ? null : callbackValue,
+  );
 
   if (typeof email !== 'string' || typeof password !== 'string') {
     return {
@@ -37,7 +61,7 @@ export async function loginUser(formData: FormData): Promise<ActionResponse> {
     await signIn('credentials', {
       email,
       password,
-      redirectTo: '/',
+      redirectTo: callbackUrl,
     });
   } catch (error) {
     /**

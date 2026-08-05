@@ -180,7 +180,7 @@ export default function AddRecipesForm() {
   }
 
   return (
-    <div className="from-primary/10 via-background to-secondary/10 min-h-screen bg-gradient-to-br">
+    <div className="from-primary/10 via-background to-secondary/10 min-h-screen bg-linear-to-br">
       <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Section de formulaire : ajout ou édition d'une recette */}
         {/* Form Section */}
