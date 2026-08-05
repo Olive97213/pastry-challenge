@@ -5,6 +5,7 @@ import { accounts } from './accounts';
 import { sessions } from './sessions';
 import { recipes } from './recipes';
 import { recipeIngredients } from './recipeIngredients';
+import { recipePreparations } from './recipePreparations';
 
 /**
  * Relations utilisateur.
@@ -48,29 +49,57 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
  * Relation recette.
  *
  * Une recette :
- * - appartient à un utilisateur
- * - possède plusieurs ingrédients
+ * - appartient à un utilisateur ;
+ * - possède plusieurs préparations.
  */
 export const recipesRelations = relations(recipes, ({ one, many }) => ({
+  /**
+   * Auteur de la recette.
+   */
   author: one(users, {
     fields: [recipes.userId],
     references: [users.id],
   }),
 
-  ingredients: many(recipeIngredients),
+  /**
+   * Préparations de la recette.
+   */
+  preparations: many(recipePreparations),
 }));
 
 /**
  * Relation ingrédient.
  *
- * Un ingrédient appartient à une seule recette.
+ * Un ingrédient appartient à une seule préparation.
  */
 export const recipeIngredientsRelations = relations(
   recipeIngredients,
   ({ one }) => ({
+    /**
+     * Préparation propriétaire
+     * de cet ingrédient.
+     */
+    preparation: one(recipePreparations, {
+      fields: [recipeIngredients.preparationId],
+      references: [recipePreparations.id],
+    }),
+  }),
+);
+/**
+ * Relations des préparations.
+ *
+ * Une préparation :
+ * - appartient à une recette ;
+ * - possède plusieurs ingrédients.
+ */
+export const recipePreparationsRelations = relations(
+  recipePreparations,
+  ({ one, many }) => ({
     recipe: one(recipes, {
-      fields: [recipeIngredients.recipeId],
+      fields: [recipePreparations.recipeId],
       references: [recipes.id],
     }),
+
+    ingredients: many(recipeIngredients),
   }),
 );

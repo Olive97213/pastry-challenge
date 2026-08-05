@@ -1,12 +1,11 @@
 import { pgTable, uuid, varchar, integer, text } from 'drizzle-orm/pg-core';
-
-import { recipes } from './recipes';
+import { recipePreparations } from './recipePreparations';
 import { timestamps } from './common';
 
 /**
  * Ingrédients associés aux recettes.
  *
- * Une recette possède plusieurs ingrédients.
+ * Une préparation possède plusieurs ingrédients
  */
 export const recipeIngredients = pgTable('recipe_ingredients', {
   /**
@@ -15,11 +14,21 @@ export const recipeIngredients = pgTable('recipe_ingredients', {
   id: uuid('id').defaultRandom().primaryKey(),
 
   /**
-   * Recette à laquelle appartient l'ingrédient.
+   * Préparation à laquelle appartient l'ingrédient.
+   *
+   * Exemple :
+   *
+   * Préparation :
+   * "Mousse chocolat"
+   *
+   * Ingrédients :
+   * - Chocolat noir
+   * - Crème liquide
+   * - Gélatine
    */
-  recipeId: uuid('recipe_id')
+  preparationId: uuid('preparation_id')
     .notNull()
-    .references(() => recipes.id, {
+    .references(() => recipePreparations.id, {
       onDelete: 'cascade',
     }),
 
