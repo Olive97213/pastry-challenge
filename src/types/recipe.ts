@@ -1,76 +1,116 @@
 /**
- * Réponse standard des actions recettes.
+ * Niveau de difficulté
+ * d'une recette.
  */
-export type RecipeActionResponse = {
-  success: boolean;
-
-  message: string;
-
-  errors?: {
-    field: string;
-    message: string;
-  }[];
-
-  recipeId?: string;
-};
+export type RecipeDifficulty = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 
 /**
- * Un ingrédient d'une recette.
+ * Un ingrédient d'une préparation.
  */
-export type RecipeIngredientInput = {
+export type RecipeIngredient = {
+  /**
+   * Identifiant temporaire
+   * utilisé côté client.
+   */
+  id: string;
+
   /**
    * Nom de l'ingrédient.
    */
   name: string;
 
   /**
-   * Quantité numérique.
+   * Quantité.
    */
   quantity?: number;
 
   /**
-   * Unité :
-   * g, ml, cl, pièce...
+   * Unité.
    */
   unit?: string;
+
+  /**
+   * Information complémentaire.
+   *
+   * Exemple :
+   * "Température ambiante"
+   */
+  note?: string;
+
+  /**
+   * Ordre d'affichage.
+   */
+  position: number;
 };
 
 /**
- * Données temporaires conservées
- * pendant le wizard.
+ * Une étape de réalisation.
  */
-export type RecipeWizardData = {
-  title?: string;
+export type RecipeStep = {
+  /**
+   * Identifiant temporaire.
+   */
+  id: string;
 
+  /**
+   * Description de l'étape.
+   */
+  description: string;
+
+  /**
+   * Ordre d'affichage.
+   */
+  position: number;
+};
+
+/**
+ * Une préparation.
+ *
+ * Exemple :
+ *
+ * - Pâte sucrée
+ * - Crémeux citron
+ * - Mousse vanille
+ */
+export type RecipePreparation = {
+  /**
+   * Identifiant temporaire.
+   */
+  id: string;
+
+  /**
+   * Nom de la préparation.
+   */
+  title: string;
+
+  /**
+   * Description.
+   */
   description?: string;
 
-  image?: string;
+  /**
+   * Ordre d'affichage.
+   */
+  position: number;
 
-  difficulty?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  /**
+   * Ingrédients.
+   */
+  ingredients: RecipeIngredient[];
 
-  ingredients?: RecipeIngredientInput[];
-
-  instructions?: string;
-
-  prepTime?: number;
-
-  cookTime?: number;
-
-  restTime?: number;
-
-  servings?: number;
+  /**
+   * Étapes.
+   */
+  steps: RecipeStep[];
 };
 
 /**
- * Données nécessaires pour créer
- * une recette en base.
- *
- * À ce stade du processus,
- * les champs obligatoires ont été validés.
+ * Toutes les données
+ * de l'éditeur de recette.
  */
-export type CreateRecipeInput = {
+export type RecipeEditorData = {
   /**
-   * Nom obligatoire de la recette.
+   * Informations générales.
    */
   title: string;
 
@@ -78,9 +118,7 @@ export type CreateRecipeInput = {
 
   image?: string;
 
-  difficulty?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
-
-  instructions?: string;
+  difficulty: RecipeDifficulty;
 
   prepTime?: number;
 
@@ -90,16 +128,8 @@ export type CreateRecipeInput = {
 
   servings?: number;
 
-  ingredients?: RecipeIngredientInput[];
-};
-
-/**
- * Données nécessaires pour mettre à jour
- * une recette existante.
- */
-export type UpdateRecipeInput = CreateRecipeInput & {
   /**
-   * Identifiant de la recette à modifier.
+   * Liste des préparations.
    */
-  id: string;
+  preparations: RecipePreparation[];
 };

@@ -64,13 +64,6 @@ export const recipes = pgTable('recipes', {
   description: text('description'),
 
   /**
-   * Étapes détaillées de réalisation.
-   *
-   * Peut être complétée avant publication.
-   */
-  instructions: text('instructions'),
-
-  /**
    * Temps de préparation en minutes.
    */
   prepTime: integer('prep_time'),

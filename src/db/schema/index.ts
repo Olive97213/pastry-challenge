@@ -6,6 +6,7 @@ export * from './verificationTokens';
 export * from './recipes';
 export * from './recipeIngredients';
 export * from './recipePreparations';
+export * from './recipeSteps';
 
 export * from './enums';
 export * from './relations';

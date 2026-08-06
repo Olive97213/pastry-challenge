@@ -6,6 +6,7 @@ import { sessions } from './sessions';
 import { recipes } from './recipes';
 import { recipeIngredients } from './recipeIngredients';
 import { recipePreparations } from './recipePreparations';
+import { recipeSteps } from './recipeSteps';
 
 /**
  * Relations utilisateur.
@@ -101,5 +102,27 @@ export const recipePreparationsRelations = relations(
     }),
 
     ingredients: many(recipeIngredients),
+    /**
+     * Étapes de réalisation
+     * de cette préparation.
+     */
+    steps: many(recipeSteps),
   }),
 );
+
+/**
+ * Relations des étapes.
+ *
+ * Une étape appartient
+ * à une seule préparation.
+ */
+export const recipeStepsRelations = relations(recipeSteps, ({ one }) => ({
+  /**
+   * Préparation propriétaire
+   * de cette étape.
+   */
+  preparation: one(recipePreparations, {
+    fields: [recipeSteps.preparationId],
+    references: [recipePreparations.id],
+  }),
+}));
