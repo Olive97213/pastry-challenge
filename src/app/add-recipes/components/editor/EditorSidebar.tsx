@@ -1,8 +1,10 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { useRecipeEditor } from '@/providers/RecipeEditorProvider';
 
 export default function EditorSidebar() {
+  const { selectedView, setSelectedView } = useRecipeEditor();
   return (
     <div className="flex h-full flex-col p-4">
       <h2 className="mb-6 text-lg font-semibold">Éditeur</h2>
@@ -12,7 +14,11 @@ export default function EditorSidebar() {
           Informations
         </Button>
 
-        <Button variant="ghost" className="w-full justify-start">
+        <Button
+          variant={selectedView === 'preparations' ? 'secondary' : 'ghost'}
+          className="w-full justify-start"
+          onClick={() => setSelectedView('preparations')}
+        >
           Préparations
         </Button>
 

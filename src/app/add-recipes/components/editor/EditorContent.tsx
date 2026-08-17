@@ -1,6 +1,8 @@
 'use client';
 
 import { useRecipeEditor } from '@/providers/RecipeEditorProvider';
+import PreparationList from './PreparationList';
+import PreparationEditor from './PreparationEditor';
 
 export default function EditorContent() {
   const { selectedView } = useRecipeEditor();
@@ -10,7 +12,7 @@ export default function EditorContent() {
   }
 
   if (selectedView === 'preparations') {
-    return <div>Liste des préparations</div>;
+    return <PreparationList />;
   }
 
   if (selectedView === 'preview') {
@@ -18,7 +20,7 @@ export default function EditorContent() {
   }
 
   if (typeof selectedView === 'object' && selectedView.type === 'preparation') {
-    return <div>Édition préparation :{selectedView.id}</div>;
+    return <PreparationEditor preparationId={selectedView.id} />;
   }
 
   return null;

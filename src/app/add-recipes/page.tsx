@@ -2,6 +2,7 @@ import { auth } from '@/auth';
 import RecipeWizard from './components/RecipeWizard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { redirect } from 'next/navigation';
+import RecipeEditor from './components/RecipeEditor';
 
 /**
  * Page de création de recette.
@@ -25,7 +26,8 @@ export default async function AddRecipePage() {
             </p>
           </CardHeader>
           <CardContent className="px-4 py-6 sm:px-6">
-            <RecipeWizard mode="create" />
+            {/* <RecipeWizard mode="create" /> */}
+            <RecipeEditor />
           </CardContent>
         </Card>
       </div>
