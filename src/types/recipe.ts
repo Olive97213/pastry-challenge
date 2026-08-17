@@ -5,6 +5,27 @@
 export type RecipeDifficulty = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 
 /**
+ * Unités disponibles pour les ingrédients.
+ *
+ * Les valeurs sont volontairement normalisées
+ * afin de faciliter les recherches, les calculs
+ * et les conversions futures.
+ */
+export type RecipeIngredientUnit =
+  | 'g'
+  | 'kg'
+  | 'ml'
+  | 'cl'
+  | 'l'
+  | 'piece'
+  | 'feuille'
+  | 'gousse'
+  | 'pincee'
+  | 'sachet'
+  | 'cuillere-a-cafe'
+  | 'cuillere-a-soupe';
+
+/**
  * Un ingrédient d'une préparation.
  */
 export type RecipeIngredient = {
@@ -27,7 +48,7 @@ export type RecipeIngredient = {
   /**
    * Unité.
    */
-  unit?: string;
+  unit?: RecipeIngredientUnit;
 
   /**
    * Information complémentaire.
