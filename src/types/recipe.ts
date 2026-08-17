@@ -105,9 +105,9 @@ export type RecipePreparation = {
   title: string;
 
   /**
-   * Description.
+   * Description de la préparation.
    */
-  description?: string;
+  description: string;
 
   /**
    * Ordre d'affichage.
@@ -115,19 +115,20 @@ export type RecipePreparation = {
   position: number;
 
   /**
-   * Ingrédients.
+   * Ingrédients utilisés
+   * pour cette préparation.
    */
   ingredients: RecipeIngredient[];
 
   /**
-   * Étapes.
+   * Étapes de réalisation.
    */
   steps: RecipeStep[];
 };
 
 /**
  * Toutes les données
- * de l'éditeur de recette.
+ * manipulées par l'éditeur.
  */
 export type RecipeEditorData = {
   /**
@@ -135,22 +136,48 @@ export type RecipeEditorData = {
    */
   title: string;
 
-  description?: string;
+  /**
+   * Description générale
+   * de la recette.
+   */
+  description: string;
 
+  /**
+   * Image principale.
+   */
   image?: string;
 
+  /**
+   * Niveau de difficulté.
+   */
   difficulty: RecipeDifficulty;
 
+  /**
+   * Temps de préparation
+   * en minutes.
+   */
   prepTime?: number;
 
+  /**
+   * Temps de cuisson
+   * en minutes.
+   */
   cookTime?: number;
 
+  /**
+   * Temps de repos
+   * en minutes.
+   */
   restTime?: number;
 
+  /**
+   * Nombre de portions.
+   */
   servings?: number;
 
   /**
-   * Liste des préparations.
+   * Liste des préparations
+   * composant la recette.
    */
   preparations: RecipePreparation[];
 };

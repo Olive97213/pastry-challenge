@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import IngredientList from './IngredientList';
+import StepList from './StepList';
 
 import { useRecipeEditor } from '@/providers/RecipeEditorProvider';
 
@@ -150,11 +151,7 @@ export default function PreparationEditor({
           </p>
         </div>
 
-        <div className="rounded-lg border border-dashed p-6 text-center">
-          <p className="text-muted-foreground text-sm">
-            Les étapes seront ajoutées ici.
-          </p>
-        </div>
+        <StepList preparationId={preparation.id} />
       </section>
     </div>
   );

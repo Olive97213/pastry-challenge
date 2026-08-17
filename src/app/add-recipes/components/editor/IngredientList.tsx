@@ -37,6 +37,15 @@ export default function IngredientList({ preparationId }: Props) {
             className="grid gap-2 sm:grid-cols-[100px_120px_1fr_1fr_auto]"
           >
             <Input
+              value={ingredient.name}
+              placeholder="Ex. Farine T55"
+              onChange={(event) =>
+                updateIngredient(preparation.id, ingredient.id, {
+                  name: event.target.value,
+                })
+              }
+            />
+            <Input
               type="number"
               min="0"
               step="any"
@@ -56,15 +65,6 @@ export default function IngredientList({ preparationId }: Props) {
               onChange={(unit) =>
                 updateIngredient(preparation.id, ingredient.id, {
                   unit,
-                })
-              }
-            />
-            <Input
-              value={ingredient.name}
-              placeholder="Ex. Farine T55"
-              onChange={(event) =>
-                updateIngredient(preparation.id, ingredient.id, {
-                  name: event.target.value,
                 })
               }
             />

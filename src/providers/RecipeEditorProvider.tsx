@@ -68,6 +68,25 @@ type RecipeEditorContextValue = {
   removeIngredient: (preparationId: string, ingredientId: string) => void;
 
   /**
+   * Ajoute une étape.
+   */
+  addStep: (preparationId: string) => void;
+
+  /**
+   * Modifie une étape.
+   */
+  updateStep: (
+    preparationId: string,
+    stepId: string,
+    values: Partial<RecipeEditorData['preparations'][number]['steps'][number]>,
+  ) => void;
+
+  /**
+   * Supprime une étape.
+   */
+  removeStep: (preparationId: string, stepId: string) => void;
+
+  /**
    * Mise à jour complète
    * des données.
    */
@@ -302,6 +321,96 @@ export function RecipeEditorProvider({ children, initialData }: Props) {
       }),
     }));
   }
+  /**
+   * Ajoute une nouvelle étape
+   * à une préparation.
+   */
+  function addStep(preparationId: string) {
+    const stepId = crypto.randomUUID();
+
+    setData((previous) => ({
+      ...previous,
+
+      preparations: previous.preparations.map((preparation) => {
+        if (preparation.id !== preparationId) {
+          return preparation;
+        }
+
+        return {
+          ...preparation,
+
+          steps: [
+            ...preparation.steps,
+
+            {
+              id: stepId,
+
+              description: '',
+
+              position: preparation.steps.length,
+            },
+          ],
+        };
+      }),
+    }));
+  }
+  /**
+   * Modifie une étape existante.
+   */
+  function updateStep(
+    preparationId: string,
+    stepId: string,
+    values: Partial<RecipeEditorData['preparations'][number]['steps'][number]>,
+  ) {
+    setData((previous) => ({
+      ...previous,
+
+      preparations: previous.preparations.map((preparation) => {
+        if (preparation.id !== preparationId) {
+          return preparation;
+        }
+
+        return {
+          ...preparation,
+
+          steps: preparation.steps.map((step) =>
+            step.id === stepId
+              ? {
+                  ...step,
+                  ...values,
+                }
+              : step,
+          ),
+        };
+      }),
+    }));
+  }
+  /**
+   * Supprime une étape.
+   */
+  function removeStep(preparationId: string, stepId: string) {
+    setData((previous) => ({
+      ...previous,
+
+      preparations: previous.preparations.map((preparation) => {
+        if (preparation.id !== preparationId) {
+          return preparation;
+        }
+
+        const steps = preparation.steps
+          .filter((step) => step.id !== stepId)
+          .map((step, index) => ({
+            ...step,
+            position: index,
+          }));
+
+        return {
+          ...preparation,
+          steps,
+        };
+      }),
+    }));
+  }
 
   const value = useMemo(
     () => ({
@@ -318,6 +427,10 @@ export function RecipeEditorProvider({ children, initialData }: Props) {
       addIngredient,
       updateIngredient,
       removeIngredient,
+
+      addStep,
+      updateStep,
+      removeStep,
     }),
     [data, selectedView],
   );
