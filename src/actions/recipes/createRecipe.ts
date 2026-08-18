@@ -4,7 +4,12 @@ import { auth } from '@/auth';
 
 import { db } from '@/db/client';
 
-import { recipes, recipeIngredients } from '@/db/schema';
+import {
+  recipes,
+  recipePreparations,
+  recipeIngredients,
+  recipeSteps,
+} from '@/db/schema';
 
 import { generateSlug } from '@/lib/slug';
 
@@ -14,9 +19,14 @@ import type { CreateRecipeInput, RecipeActionResponse } from '@/types/recipe';
  * Création d'une recette brouillon.
  *
  * Cette action :
- * - vérifie l'utilisateur connecté
- * - crée la recette
- * - ajoute les ingrédients associés
+ *
+ * - vérifie que l'utilisateur est connecté ;
+ * - crée la recette ;
+ * - crée les préparations ;
+ * - crée les ingrédients de chaque préparation ;
+ * - crée les étapes de chaque préparation ;
+ * - effectue toutes les opérations dans
+ *   une seule transaction PostgreSQL.
  */
 export async function createRecipe(
   data: CreateRecipeInput,
@@ -29,73 +39,158 @@ export async function createRecipe(
   if (!session?.user?.id) {
     return {
       success: false,
-
       message: 'Utilisateur non connecté',
     };
   }
 
   /**
-   * Génération du slug.
+   * Vérification minimale du titre.
    */
-  const slug = generateSlug(data.title);
-
-  /**
-   * Insertion de la recette.
-   */
-  const [recipe] = await db
-    .insert(recipes)
-    .values({
-      userId: session.user.id,
-
-      title: data.title,
-
-      slug,
-
-      image: data.image,
-
-      description: data.description,
-
-      instructions: data.instructions,
-
-      prepTime: data.prepTime,
-
-      cookTime: data.cookTime,
-
-      restTime: data.restTime,
-
-      servings: data.servings,
-
-      difficulty: data.difficulty,
-    })
-    .returning({
-      id: recipes.id,
-    });
-
-  /**
-   * Ajout des ingrédients liés
-   * à la recette.
-   */
-  if (data.ingredients && data.ingredients.length > 0) {
-    await db.insert(recipeIngredients).values(
-      data.ingredients.map((ingredient, index) => ({
-        recipeId: recipe.id,
-
-        name: ingredient.name,
-
-        quantity: ingredient.quantity,
-
-        unit: ingredient.unit,
-
-        position: index,
-      })),
-    );
+  if (!data.title.trim()) {
+    return {
+      success: false,
+      message: 'Le titre de la recette est obligatoire',
+    };
   }
 
-  return {
-    success: true,
+  try {
+    /**
+     * Génération du slug.
+     */
+    const slug = generateSlug(data.title);
 
-    message: 'Recette enregistrée',
+    /**
+     * Transaction PostgreSQL.
+     *
+     * Toutes les opérations seront annulées
+     * si une seule d'entre elles échoue.
+     */
+    const recipeId = await db.transaction(async (tx) => {
+      /**
+       * Création de la recette principale.
+       */
+      const [recipe] = await tx
+        .insert(recipes)
+        .values({
+          userId: session.user.id,
 
-    recipeId: recipe.id,
-  };
+          title: data.title.trim(),
+
+          slug,
+
+          image: data.image,
+
+          description: data.description,
+
+          prepTime: data.prepTime,
+
+          cookTime: data.cookTime,
+
+          restTime: data.restTime,
+
+          servings: data.servings,
+
+          difficulty: data.difficulty,
+
+          /**
+           * Toute nouvelle recette
+           * commence en brouillon.
+           */
+          status: 'DRAFT',
+        })
+        .returning({
+          id: recipes.id,
+        });
+
+      /**
+       * Création de chaque préparation.
+       */
+      for (const preparation of data.preparations) {
+        /**
+         * Création de la préparation.
+         */
+        const [createdPreparation] = await tx
+          .insert(recipePreparations)
+          .values({
+            recipeId: recipe.id,
+
+            title: preparation.title.trim(),
+
+            description: preparation.description.trim() || null,
+
+            position: preparation.position,
+          })
+          .returning({
+            id: recipePreparations.id,
+          });
+
+        /**
+         * Création des ingrédients
+         * de la préparation.
+         */
+        if (preparation.ingredients.length > 0) {
+          await tx.insert(recipeIngredients).values(
+            preparation.ingredients.map((ingredient) => ({
+              preparationId: createdPreparation.id,
+
+              name: ingredient.name.trim(),
+
+              quantity: ingredient.quantity,
+
+              unit: ingredient.unit,
+
+              note: ingredient.note?.trim() || null,
+
+              position: ingredient.position,
+            })),
+          );
+        }
+
+        /**
+         * Création des étapes
+         * de la préparation.
+         */
+        if (preparation.steps.length > 0) {
+          await tx.insert(recipeSteps).values(
+            preparation.steps.map((step) => ({
+              preparationId: createdPreparation.id,
+
+              description: step.description.trim(),
+
+              position: step.position,
+            })),
+          );
+        }
+      }
+
+      /**
+       * Retourne l'identifiant de la recette.
+       */
+      return recipe.id;
+    });
+
+    /**
+     * La transaction s'est terminée
+     * correctement.
+     */
+    return {
+      success: true,
+
+      message: 'Recette enregistrée',
+
+      recipeId,
+    };
+  } catch (error) {
+    /**
+     * Gestion des erreurs inattendues.
+     */
+    console.error('Erreur création recette :', error);
+
+    return {
+      success: false,
+
+      message:
+        "Une erreur est survenue lors de l'enregistrement de la recette.",
+    };
+  }
 }

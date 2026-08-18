@@ -181,3 +181,11 @@ export type RecipeEditorData = {
    */
   preparations: RecipePreparation[];
 };
+/**
+ * Données utilisées lors
+ * de la création d'une recette.
+ *
+ * Pour le MVP, elles correspondent
+ * exactement aux données de l'éditeur.
+ */
+export type CreateRecipeInput = RecipeEditorData;
