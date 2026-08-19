@@ -189,3 +189,28 @@ export type RecipeEditorData = {
  * exactement aux données de l'éditeur.
  */
 export type CreateRecipeInput = RecipeEditorData;
+
+/**
+ * Réponse retournée par les actions
+ * serveur liées aux recettes.
+ */
+export type RecipeActionResponse = {
+  /**
+   * Indique si l'opération
+   * s'est correctement terminée.
+   */
+  success: boolean;
+
+  /**
+   * Message destiné à l'utilisateur.
+   */
+  message: string;
+
+  /**
+   * Identifiant de la recette créée.
+   *
+   * Présent uniquement lorsque
+   * la création a réussi.
+   */
+  recipeId?: string;
+};
