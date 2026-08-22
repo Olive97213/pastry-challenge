@@ -15,30 +15,36 @@ export default function PreparationList() {
   return (
     <div className="space-y-6">
       {/* En-tête de la section. */}
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-semibold">Préparations</h2>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-1">
+          <h2 className="text-2xl font-semibold tracking-tight">
+            Préparations
+          </h2>
 
           <p className="text-muted-foreground text-sm">
             Organise les différentes préparations de ta recette.
           </p>
         </div>
 
-        <Button type="button" onClick={addPreparation}>
+        <Button
+          type="button"
+          className="w-full sm:w-auto"
+          onClick={addPreparation}
+        >
           + Ajouter
         </Button>
       </div>
 
       {/* Liste des préparations. */}
       {data.preparations.length > 0 ? (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {data.preparations
             .slice()
             .sort((a, b) => a.position - b.position)
             .map((preparation) => (
               <div
                 key={preparation.id}
-                className="flex items-center justify-between gap-4 rounded-lg border p-4"
+                className="border-border/70 bg-card/70 flex flex-col gap-3 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between"
               >
                 <button
                   type="button"
@@ -50,7 +56,7 @@ export default function PreparationList() {
                     })
                   }
                 >
-                  <p className="font-medium">
+                  <p className="text-foreground font-medium">
                     {preparation.title || 'Sans nom'}
                   </p>
 
@@ -67,6 +73,7 @@ export default function PreparationList() {
                   type="button"
                   variant="ghost"
                   size="sm"
+                  className="w-full sm:w-auto"
                   onClick={() => removePreparation(preparation.id)}
                 >
                   Supprimer
@@ -75,7 +82,7 @@ export default function PreparationList() {
             ))}
         </div>
       ) : (
-        <div className="rounded-lg border border-dashed p-8 text-center">
+        <div className="border-border/80 bg-card/50 rounded-2xl border border-dashed p-8 text-center">
           <p className="font-medium">Aucune préparation</p>
 
           <p className="text-muted-foreground mt-1 text-sm">

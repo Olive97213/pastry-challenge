@@ -38,7 +38,7 @@ export default function PreparationEditor({
     return (
       <div className="space-y-4">
         <p className="text-muted-foreground">
-          Cette préparation n'existe plus.
+          Cette préparation n&apos;existe plus.
         </p>
 
         <Button
@@ -52,40 +52,50 @@ export default function PreparationEditor({
     );
   }
 
+  const currentPreparation = preparation;
+
   /**
    * Supprime la préparation après confirmation.
    */
   function handleRemove() {
     const confirmed = window.confirm(
-      `Supprimer la préparation « ${preparation.title || 'Sans nom'} » ?`,
+      `Supprimer la préparation « ${currentPreparation.title || 'Sans nom'} » ?`,
     );
 
     if (!confirmed) {
       return;
     }
 
-    removePreparation(preparation.id);
+    removePreparation(currentPreparation.id);
+    setSelectedView('preparations');
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* En-tête de la préparation. */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-semibold">Modifier la préparation</h2>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="space-y-1">
+          <h2 className="text-2xl font-semibold tracking-tight">
+            Modifier la préparation
+          </h2>
 
-          <p className="text-muted-foreground mt-1 text-sm">
+          <p className="text-muted-foreground text-sm">
             Définis les informations de cette préparation.
           </p>
         </div>
 
-        <Button type="button" variant="destructive" onClick={handleRemove}>
+        <Button
+          type="button"
+          variant="destructive"
+          className="w-full sm:w-auto"
+          onClick={handleRemove}
+        >
           Supprimer
         </Button>
       </div>
 
       {/* Informations générales. */}
-      <section className="space-y-5 rounded-lg border p-5">
+      <section className="border-border/70 bg-card/70 space-y-5 rounded-2xl border p-4 sm:p-5">
         <div className="space-y-2">
           <label
             htmlFor={`preparation-title-${preparation.id}`}
@@ -97,6 +107,7 @@ export default function PreparationEditor({
           <Input
             id={`preparation-title-${preparation.id}`}
             value={preparation.title}
+            className="h-11 rounded-xl"
             onChange={(event) =>
               updatePreparation(preparation.id, {
                 title: event.target.value,
@@ -117,6 +128,7 @@ export default function PreparationEditor({
           <Textarea
             id={`preparation-description-${preparation.id}`}
             value={preparation.description ?? ''}
+            className="rounded-xl"
             onChange={(event) =>
               updatePreparation(preparation.id, {
                 description: event.target.value,
@@ -129,7 +141,7 @@ export default function PreparationEditor({
       </section>
 
       {/* Ingrédients. */}
-      <section className="space-y-4">
+      <section className="border-border/70 bg-card/70 space-y-4 rounded-2xl border p-4 sm:p-5">
         <div>
           <h3 className="text-lg font-semibold">Ingrédients</h3>
 
@@ -142,7 +154,7 @@ export default function PreparationEditor({
       </section>
 
       {/* Étapes. */}
-      <section className="space-y-4">
+      <section className="border-border/70 bg-card/70 space-y-4 rounded-2xl border p-4 sm:p-5">
         <div>
           <h3 className="text-lg font-semibold">Étapes</h3>
 

@@ -56,25 +56,30 @@ export default function InformationEditor() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* En-tête */}
-      <div>
-        <h2 className="text-xl font-semibold">Informations générales</h2>
+      <div className="space-y-1">
+        <h2 className="text-2xl font-semibold tracking-tight">
+          Informations générales
+        </h2>
 
-        <p className="text-muted-foreground mt-1 text-sm">
+        <p className="text-muted-foreground text-sm">
           Renseigne les informations principales de ta recette.
         </p>
       </div>
 
       {/* Informations principales */}
-      <section className="space-y-5">
+      <section className="border-border/70 bg-card/70 space-y-5 rounded-2xl border p-4 sm:p-5">
         <div className="space-y-2">
-          <Label htmlFor="recipe-title">Titre</Label>
+          <Label htmlFor="recipe-title" className="text-sm font-medium">
+            Titre
+          </Label>
 
           <Input
             id="recipe-title"
             value={data.title}
             placeholder="Ex. Tarte au citron meringuée"
+            className="h-11 rounded-xl"
             onChange={(event) =>
               updateData({
                 title: event.target.value,
@@ -84,13 +89,16 @@ export default function InformationEditor() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="recipe-description">Description</Label>
+          <Label htmlFor="recipe-description" className="text-sm font-medium">
+            Description
+          </Label>
 
           <Textarea
             id="recipe-description"
             value={data.description ?? ''}
             placeholder="Présente brièvement ta recette..."
             rows={4}
+            className="rounded-xl"
             onChange={(event) =>
               updateData({
                 description: event.target.value,
@@ -100,13 +108,16 @@ export default function InformationEditor() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="recipe-image">Image</Label>
+          <Label htmlFor="recipe-image" className="text-sm font-medium">
+            Image
+          </Label>
 
           <Input
             id="recipe-image"
             type="url"
             value={data.image ?? ''}
             placeholder="https://..."
+            className="h-11 rounded-xl"
             onChange={(event) =>
               updateData({
                 image: event.target.value,
@@ -121,9 +132,9 @@ export default function InformationEditor() {
       </section>
 
       {/* Difficulté */}
-      <section className="space-y-3">
+      <section className="border-border/70 bg-card/70 space-y-4 rounded-2xl border p-4 sm:p-5">
         <div>
-          <h3 className="font-medium">Difficulté</h3>
+          <h3 className="text-lg font-semibold">Difficulté</h3>
 
           <p className="text-muted-foreground text-sm">
             Indique le niveau nécessaire pour réaliser la recette.
@@ -141,10 +152,10 @@ export default function InformationEditor() {
             <button
               key={value}
               type="button"
-              className={`rounded-md border px-4 py-2 text-sm transition ${
+              className={`rounded-full border px-4 py-2 text-sm font-medium transition-all ${
                 data.difficulty === value
-                  ? 'bg-primary text-primary-foreground'
-                  : 'hover:bg-muted'
+                  ? 'border-primary bg-primary text-primary-foreground shadow-sm'
+                  : 'border-border bg-background/60 text-foreground hover:border-primary/60 hover:bg-accent'
               }`}
               onClick={() =>
                 updateData({
@@ -159,9 +170,9 @@ export default function InformationEditor() {
       </section>
 
       {/* Temps et portions */}
-      <section className="space-y-4">
+      <section className="border-border/70 bg-card/70 space-y-4 rounded-2xl border p-4 sm:p-5">
         <div>
-          <h3 className="font-medium">Temps et portions</h3>
+          <h3 className="text-lg font-semibold">Temps et portions</h3>
 
           <p className="text-muted-foreground text-sm">
             Ces informations permettront notamment d&apos;afficher les
@@ -171,13 +182,16 @@ export default function InformationEditor() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="prep-time">Préparation (minutes)</Label>
+            <Label htmlFor="prep-time" className="text-sm font-medium">
+              Préparation (minutes)
+            </Label>
 
             <Input
               id="prep-time"
               type="number"
               min="0"
               value={data.prepTime ?? ''}
+              className="h-11 rounded-xl"
               onChange={(event) =>
                 updateData({
                   prepTime: parseNumber(event.target.value),
@@ -187,13 +201,16 @@ export default function InformationEditor() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="cook-time">Cuisson (minutes)</Label>
+            <Label htmlFor="cook-time" className="text-sm font-medium">
+              Cuisson (minutes)
+            </Label>
 
             <Input
               id="cook-time"
               type="number"
               min="0"
               value={data.cookTime ?? ''}
+              className="h-11 rounded-xl"
               onChange={(event) =>
                 updateData({
                   cookTime: parseNumber(event.target.value),
@@ -203,13 +220,16 @@ export default function InformationEditor() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="rest-time">Repos (minutes)</Label>
+            <Label htmlFor="rest-time" className="text-sm font-medium">
+              Repos (minutes)
+            </Label>
 
             <Input
               id="rest-time"
               type="number"
               min="0"
               value={data.restTime ?? ''}
+              className="h-11 rounded-xl"
               onChange={(event) =>
                 updateData({
                   restTime: parseNumber(event.target.value),
@@ -219,13 +239,16 @@ export default function InformationEditor() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="servings">Portions</Label>
+            <Label htmlFor="servings" className="text-sm font-medium">
+              Portions
+            </Label>
 
             <Input
               id="servings"
               type="number"
               min="1"
               value={data.servings ?? ''}
+              className="h-11 rounded-xl"
               onChange={(event) =>
                 updateData({
                   servings: parseNumber(event.target.value),

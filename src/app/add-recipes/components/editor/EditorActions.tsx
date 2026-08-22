@@ -93,16 +93,12 @@ export default function EditorActions() {
       toast.success('Recette enregistrée avec succès.');
 
       /**
-       * Redirection vers le dashboard
-       * des recettes.
+       * Redirection directe vers la page
+       * "Mes recettes" après la création.
+       * Utiliser window.location garantit une navigation
+       * immédiate même si l’état du router est encore stable.
        */
-      router.push('/dashboard/recipes');
-
-      /**
-       * Actualise les données de la page
-       * après la redirection.
-       */
-      router.refresh();
+      window.location.assign('/dashboard/recipes');
     } catch (error) {
       /**
        * Gestion des erreurs inattendues.
@@ -119,17 +115,23 @@ export default function EditorActions() {
   }
 
   return (
-    <div className="flex items-center justify-end gap-3 border-t pt-4">
+    <div className="border-border/70 flex flex-col-reverse gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-end">
       <Button
         type="button"
         variant="outline"
+        className="w-full sm:w-auto"
         disabled={isSaving}
-        onClick={() => router.push('/dashboard/recipes')}
+        onClick={() => router.replace('/dashboard/recipes')}
       >
         Annuler
       </Button>
 
-      <Button type="button" disabled={isSaving} onClick={handleSave}>
+      <Button
+        type="button"
+        className="w-full sm:w-auto"
+        disabled={isSaving}
+        onClick={handleSave}
+      >
         {isSaving ? 'Enregistrement...' : 'Enregistrer la recette'}
       </Button>
     </div>

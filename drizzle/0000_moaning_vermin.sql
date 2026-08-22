@@ -52,7 +52,6 @@ CREATE TABLE "recipes" (
 	"title" varchar(150) NOT NULL,
 	"slug" varchar(180) NOT NULL,
 	"description" text,
-	"instructions" text,
 	"prep_time" integer,
 	"cook_time" integer,
 	"rest_time" integer,
@@ -68,7 +67,7 @@ CREATE TABLE "recipes" (
 --> statement-breakpoint
 CREATE TABLE "recipe_ingredients" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"recipe_id" uuid NOT NULL,
+	"preparation_id" uuid NOT NULL,
 	"name" varchar(100) NOT NULL,
 	"quantity" integer,
 	"unit" varchar(20),
@@ -78,7 +77,28 @@ CREATE TABLE "recipe_ingredients" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "recipe_preparations" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"recipe_id" uuid NOT NULL,
+	"title" varchar(150) NOT NULL,
+	"description" text,
+	"position" integer DEFAULT 0 NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "recipe_steps" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"preparation_id" uuid NOT NULL,
+	"description" text NOT NULL,
+	"position" integer DEFAULT 0 NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "recipes" ADD CONSTRAINT "recipes_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "recipe_ingredients" ADD CONSTRAINT "recipe_ingredients_recipe_id_recipes_id_fk" FOREIGN KEY ("recipe_id") REFERENCES "public"."recipes"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "recipe_ingredients" ADD CONSTRAINT "recipe_ingredients_preparation_id_recipe_preparations_id_fk" FOREIGN KEY ("preparation_id") REFERENCES "public"."recipe_preparations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "recipe_preparations" ADD CONSTRAINT "recipe_preparations_recipe_id_recipes_id_fk" FOREIGN KEY ("recipe_id") REFERENCES "public"."recipes"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "recipe_steps" ADD CONSTRAINT "recipe_steps_preparation_id_recipe_preparations_id_fk" FOREIGN KEY ("preparation_id") REFERENCES "public"."recipe_preparations"("id") ON DELETE cascade ON UPDATE no action;

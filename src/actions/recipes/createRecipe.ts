@@ -43,6 +43,8 @@ export async function createRecipe(
     };
   }
 
+  const userId = session.user.id;
+
   /**
    * Vérification minimale du titre.
    */
@@ -72,7 +74,7 @@ export async function createRecipe(
       const [recipe] = await tx
         .insert(recipes)
         .values({
-          userId: session.user.id,
+          userId,
 
           title: data.title.trim(),
 

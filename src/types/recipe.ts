@@ -191,6 +191,14 @@ export type RecipeEditorData = {
 export type CreateRecipeInput = RecipeEditorData;
 
 /**
+ * Données utilisées lors de la mise à jour
+ * d'une recette existante.
+ */
+export type UpdateRecipeInput = {
+  id: string;
+} & Partial<CreateRecipeInput>;
+
+/**
  * Réponse retournée par les actions
  * serveur liées aux recettes.
  */

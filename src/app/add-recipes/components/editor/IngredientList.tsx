@@ -34,11 +34,12 @@ export default function IngredientList({ preparationId }: Props) {
         .map((ingredient) => (
           <div
             key={ingredient.id}
-            className="grid gap-2 sm:grid-cols-[100px_120px_1fr_1fr_auto]"
+            className="border-border/70 bg-background/50 grid gap-2 rounded-xl border p-2 md:grid-cols-[minmax(0,1.6fr)_minmax(80px,0.7fr)_minmax(120px,0.9fr)_minmax(0,1.2fr)_auto]"
           >
             <Input
               value={ingredient.name}
               placeholder="Ex. Farine T55"
+              className="h-10 rounded-lg"
               onChange={(event) =>
                 updateIngredient(preparation.id, ingredient.id, {
                   name: event.target.value,
@@ -50,7 +51,8 @@ export default function IngredientList({ preparationId }: Props) {
               min="0"
               step="any"
               value={ingredient.quantity ?? ''}
-              placeholder="Quantité"
+              placeholder="Qté"
+              className="h-10 rounded-lg"
               onChange={(event) => {
                 const value = event.target.value;
 
@@ -72,6 +74,7 @@ export default function IngredientList({ preparationId }: Props) {
             <Input
               value={ingredient.note ?? ''}
               placeholder="Note"
+              className="h-10 rounded-lg"
               onChange={(event) =>
                 updateIngredient(preparation.id, ingredient.id, {
                   note: event.target.value,
@@ -83,6 +86,7 @@ export default function IngredientList({ preparationId }: Props) {
               type="button"
               variant="ghost"
               size="icon"
+              className="h-10 w-10 rounded-lg"
               onClick={() => removeIngredient(preparation.id, ingredient.id)}
               aria-label="Supprimer l'ingrédient"
             >
@@ -94,6 +98,7 @@ export default function IngredientList({ preparationId }: Props) {
       <Button
         type="button"
         variant="outline"
+        className="w-full sm:w-auto"
         onClick={() => addIngredient(preparation.id)}
       >
         Ajouter un ingrédient

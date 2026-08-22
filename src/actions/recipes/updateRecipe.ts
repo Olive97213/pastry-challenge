@@ -1,12 +1,17 @@
 'use server';
 
-import { eq, and } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 
 import { auth } from '@/auth';
 
 import { db } from '@/db/client';
 
-import { recipes, recipeIngredients } from '@/db/schema';
+import {
+  recipes,
+  recipeIngredients,
+  recipePreparations,
+  recipeSteps,
+} from '@/db/schema';
 
 import type { RecipeActionResponse, UpdateRecipeInput } from '@/types/recipe';
 
@@ -17,7 +22,7 @@ import type { RecipeActionResponse, UpdateRecipeInput } from '@/types/recipe';
  * - vérifie l'utilisateur connecté ;
  * - vérifie que la recette appartient à cet utilisateur ;
  * - met à jour les informations de la recette ;
- * - remplace les ingrédients existants ;
+ * - remplace les préparations existantes ;
  * - effectue toutes les opérations dans une transaction.
  */
 export async function updateRecipe(
@@ -34,7 +39,9 @@ export async function updateRecipe(
       message: 'Utilisateur non connecté',
     };
   }
+
   const userId = session.user.id;
+
   try {
     /**
      * Toutes les opérations sont regroupées
@@ -51,22 +58,16 @@ export async function updateRecipe(
       const [recipe] = await tx
         .update(recipes)
         .set({
-          title: data.title,
-
-          description: data.description,
-
-          instructions: data.instructions,
-
-          prepTime: data.prepTime,
-
-          cookTime: data.cookTime,
-
-          restTime: data.restTime,
-
-          servings: data.servings,
-
-          difficulty: data.difficulty ?? 'BEGINNER',
-
+          ...(data.title !== undefined && { title: data.title }),
+          ...(data.description !== undefined && {
+            description: data.description,
+          }),
+          ...(data.image !== undefined && { image: data.image }),
+          ...(data.prepTime !== undefined && { prepTime: data.prepTime }),
+          ...(data.cookTime !== undefined && { cookTime: data.cookTime }),
+          ...(data.restTime !== undefined && { restTime: data.restTime }),
+          ...(data.servings !== undefined && { servings: data.servings }),
+          ...(data.difficulty !== undefined && { difficulty: data.difficulty }),
           updatedAt: new Date(),
         })
         .where(and(eq(recipes.id, data.id), eq(recipes.userId, userId)))
@@ -84,32 +85,76 @@ export async function updateRecipe(
       }
 
       /**
-       * Suppression des anciens ingrédients.
-       *
-       * Ils seront recréés avec les données
-       * actuellement présentes dans le wizard.
+       * Suppression des anciennes préparations,
+       * ingrédients et étapes.
        */
-      await tx
-        .delete(recipeIngredients)
-        .where(eq(recipeIngredients.recipeId, data.id));
+      const existingPreparations = await tx.query.recipePreparations.findMany({
+        where: eq(recipePreparations.recipeId, data.id),
+        columns: {
+          id: true,
+        },
+      });
+
+      const existingPreparationIds = existingPreparations.map(
+        (preparation) => preparation.id,
+      );
+
+      if (existingPreparationIds.length > 0) {
+        await tx
+          .delete(recipeIngredients)
+          .where(
+            inArray(recipeIngredients.preparationId, existingPreparationIds),
+          );
+
+        await tx
+          .delete(recipeSteps)
+          .where(inArray(recipeSteps.preparationId, existingPreparationIds));
+
+        await tx
+          .delete(recipePreparations)
+          .where(inArray(recipePreparations.id, existingPreparationIds));
+      }
 
       /**
-       * Création des nouveaux ingrédients.
+       * Recréation des préparations envoyées par le client.
        */
-      if (data.ingredients && data.ingredients.length > 0) {
-        await tx.insert(recipeIngredients).values(
-          data.ingredients.map((ingredient, index) => ({
-            recipeId: data.id,
+      if (data.preparations && data.preparations.length > 0) {
+        for (const preparation of data.preparations) {
+          const [createdPreparation] = await tx
+            .insert(recipePreparations)
+            .values({
+              recipeId: data.id,
+              title: preparation.title.trim(),
+              description: preparation.description.trim() || null,
+              position: preparation.position,
+            })
+            .returning({
+              id: recipePreparations.id,
+            });
 
-            name: ingredient.name,
+          if (preparation.ingredients.length > 0) {
+            await tx.insert(recipeIngredients).values(
+              preparation.ingredients.map((ingredient) => ({
+                preparationId: createdPreparation.id,
+                name: ingredient.name.trim(),
+                quantity: ingredient.quantity,
+                unit: ingredient.unit,
+                note: ingredient.note?.trim() || null,
+                position: ingredient.position,
+              })),
+            );
+          }
 
-            quantity: ingredient.quantity,
-
-            unit: ingredient.unit,
-
-            position: index,
-          })),
-        );
+          if (preparation.steps.length > 0) {
+            await tx.insert(recipeSteps).values(
+              preparation.steps.map((step) => ({
+                preparationId: createdPreparation.id,
+                description: step.description.trim(),
+                position: step.position,
+              })),
+            );
+          }
+        }
       }
     });
 

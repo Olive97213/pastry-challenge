@@ -35,14 +35,18 @@ export default function EditorSidebar() {
   const isPreviewSelected = selectedView === 'preview';
 
   return (
-    <div className="flex h-full flex-col p-4">
-      <h2 className="mb-6 text-lg font-semibold">Éditeur</h2>
+    <div className="flex h-full flex-col gap-4 p-4 sm:p-5">
+      <div className="flex items-center justify-between gap-3 md:block">
+        <h2 className="text-muted-foreground text-sm font-semibold tracking-[0.2em] uppercase">
+          Éditeur
+        </h2>
+      </div>
 
-      <div className="space-y-2">
+      <div className="grid gap-2 md:grid-cols-1">
         {/* Informations générales */}
         <Button
           variant={isInformationSelected ? 'secondary' : 'ghost'}
-          className="w-full justify-start"
+          className="w-full justify-start rounded-xl px-3 py-2.5 text-sm font-medium"
           onClick={() => setSelectedView('information')}
         >
           Informations
@@ -51,7 +55,7 @@ export default function EditorSidebar() {
         {/* Préparations */}
         <Button
           variant={isPreparationsSelected ? 'secondary' : 'ghost'}
-          className="w-full justify-start"
+          className="w-full justify-start rounded-xl px-3 py-2.5 text-sm font-medium"
           onClick={() => setSelectedView('preparations')}
         >
           Préparations
@@ -60,7 +64,7 @@ export default function EditorSidebar() {
         {/* Aperçu */}
         <Button
           variant={isPreviewSelected ? 'secondary' : 'ghost'}
-          className="w-full justify-start"
+          className="w-full justify-start rounded-xl px-3 py-2.5 text-sm font-medium"
           onClick={() => setSelectedView('preview')}
         >
           Aperçu
