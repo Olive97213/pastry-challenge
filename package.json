@@ -13,7 +13,7 @@
     "db:check": "tsx src/db/scripts/check.ts",
     "db:clear": "tsx src/db/scripts/clear.ts",
     "db:drop": "drizzle-kit drop",
-    "db:seed": "tsx src/db/scripts/seed.ts",
+    "db:seed": "dotenv -e .env.local -- tsx src/db/scripts/seed.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
