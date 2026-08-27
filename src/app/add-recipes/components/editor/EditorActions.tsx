@@ -8,19 +8,31 @@ import { useRecipeEditor } from '@/providers/RecipeEditorProvider';
 import { Button } from '@/components/ui/button';
 
 import { toast } from 'sonner';
+
 import { createRecipe } from '@/actions/recipes/createRecipe';
+import { updateRecipe } from '@/actions/recipes/updateRecipe';
+
+/**
+ * Propriétés du composant.
+ */
+type Props = {
+  /**
+   * Identifiant de la recette.
+   *
+   * Présent uniquement en mode modification.
+   */
+  recipeId?: string;
+};
 
 /**
  * Actions principales de l'éditeur.
  *
- * Ce composant gère :
+ * Le composant fonctionne en deux modes :
  *
- * - l'enregistrement de la recette ;
- * - l'état de chargement pendant la sauvegarde ;
- * - l'affichage des messages de succès ou d'erreur ;
- * - la redirection vers le dashboard après création.
+ * - création si recipeId est absent ;
+ * - modification si recipeId est présent.
  */
-export default function EditorActions() {
+export default function EditorActions({ recipeId }: Props) {
   /**
    * Récupération des données
    * actuellement présentes dans l'éditeur.
@@ -28,14 +40,12 @@ export default function EditorActions() {
   const { data } = useRecipeEditor();
 
   /**
-   * Permet d'empêcher plusieurs
-   * sauvegardes simultanées.
+   * Empêche plusieurs sauvegardes simultanées.
    */
   const [isSaving, setIsSaving] = useState(false);
 
   /**
-   * Permet de rediriger l'utilisateur
-   * après la création de la recette.
+   * Permet de rediriger l'utilisateur.
    */
   const router = useRouter();
 
@@ -74,30 +84,38 @@ export default function EditorActions() {
       setIsSaving(true);
 
       /**
-       * Appel de l'action serveur.
+       * Mode modification.
+       */
+      if (recipeId) {
+        const result = await updateRecipe({
+          id: recipeId,
+          ...data,
+        });
+
+        if (!result.success) {
+          toast.error(result.message);
+          return;
+        }
+
+        toast.success('Recette modifiée avec succès.');
+
+        window.location.assign('/dashboard/recipes');
+
+        return;
+      }
+
+      /**
+       * Mode création.
        */
       const result = await createRecipe(data);
 
-      /**
-       * Gestion de l'échec retourné
-       * par l'action serveur.
-       */
       if (!result.success) {
         toast.error(result.message);
         return;
       }
 
-      /**
-       * Confirmation de la sauvegarde.
-       */
       toast.success('Recette enregistrée avec succès.');
 
-      /**
-       * Redirection directe vers la page
-       * "Mes recettes" après la création.
-       * Utiliser window.location garantit une navigation
-       * immédiate même si l’état du router est encore stable.
-       */
       window.location.assign('/dashboard/recipes');
     } catch (error) {
       /**
@@ -105,7 +123,9 @@ export default function EditorActions() {
        */
       console.error('Erreur lors de la sauvegarde de la recette :', error);
 
-      toast.error("Une erreur est survenue lors de l'enregistrement.");
+      toast.error(
+        "Une erreur est survenue lors de l'enregistrement de la recette.",
+      );
     } finally {
       /**
        * Réactive le bouton après la tentative.
@@ -132,7 +152,11 @@ export default function EditorActions() {
         disabled={isSaving}
         onClick={handleSave}
       >
-        {isSaving ? 'Enregistrement...' : 'Enregistrer la recette'}
+        {isSaving
+          ? 'Enregistrement...'
+          : recipeId
+            ? 'Enregistrer les modifications'
+            : 'Enregistrer la recette'}
       </Button>
     </div>
   );

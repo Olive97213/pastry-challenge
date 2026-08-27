@@ -3,8 +3,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { getRecipeBySlug } from '@/data/recipes';
 import { Button } from '@/components/ui/button';
+
 import {
   Card,
   CardContent,
@@ -12,6 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { getRecipeBySlug } from '@/data/recipes';
 
 type Props = {
   params: Promise<{
@@ -20,7 +21,7 @@ type Props = {
 };
 
 /**
- * Page publique d'une recette.
+ * Page d'affichage d'une recette.
  */
 export default async function RecipePage({ params }: Props) {
   const { slug } = await params;
@@ -54,10 +55,11 @@ export default async function RecipePage({ params }: Props) {
             </div>
           )}
 
-          <CardHeader className="space-y-3 px-4 py-4 sm:px-6">
+          <CardHeader className="space-y-4 px-4 py-6 sm:px-6">
             <div className="space-y-2">
-              <CardTitle className="text-2xl">{recipe.title}</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-3xl">{recipe.title}</CardTitle>
+
+              <CardDescription className="text-base">
                 {recipe.description ?? 'Découvrez cette recette pas à pas.'}
               </CardDescription>
             </div>
@@ -66,63 +68,138 @@ export default async function RecipePage({ params }: Props) {
               <span className="rounded-full border px-3 py-1">
                 Difficulté : {recipe.difficulty}
               </span>
+
               <span className="rounded-full border px-3 py-1">
                 Statut : {recipe.status}
               </span>
+
+              {recipe.servings && (
+                <span className="rounded-full border px-3 py-1">
+                  {recipe.servings} portions
+                </span>
+              )}
             </div>
           </CardHeader>
 
-          <CardContent className="space-y-6 px-4 py-6 sm:px-6">
+          <CardContent className="space-y-8 px-4 py-6 sm:px-6">
+            {/* Temps */}
             <section className="grid gap-4 sm:grid-cols-3">
               <div className="bg-background/70 rounded-lg border p-4">
                 <p className="text-muted-foreground text-sm">Préparation</p>
+
                 <p className="mt-1 font-semibold">{recipe.prepTime ?? 0} min</p>
               </div>
 
               <div className="bg-background/70 rounded-lg border p-4">
                 <p className="text-muted-foreground text-sm">Cuisson</p>
+
                 <p className="mt-1 font-semibold">{recipe.cookTime ?? 0} min</p>
               </div>
 
               <div className="bg-background/70 rounded-lg border p-4">
                 <p className="text-muted-foreground text-sm">Repos</p>
+
                 <p className="mt-1 font-semibold">{recipe.restTime ?? 0} min</p>
               </div>
             </section>
 
-            <section className="space-y-4">
-              <h2 className="text-xl font-semibold">Ingrédients</h2>
+            {/* Préparations */}
+            <section className="space-y-8">
+              <div>
+                <h2 className="text-2xl font-semibold">Préparation</h2>
 
-              {recipe.ingredients.length > 0 ? (
-                <ul className="space-y-2">
-                  {recipe.ingredients.map((ingredient) => (
-                    <li
-                      key={ingredient.id}
-                      className="bg-background/70 rounded-lg border p-3"
+                <p className="text-muted-foreground mt-1 text-sm">
+                  Suivez les différentes préparations de la recette.
+                </p>
+              </div>
+
+              {recipe.preparations.length > 0 ? (
+                <div className="space-y-8">
+                  {recipe.preparations.map((preparation) => (
+                    <article
+                      key={preparation.id}
+                      className="space-y-6 rounded-xl border p-5"
                     >
-                      {ingredient.name}
-                      {ingredient.quantity && <> - {ingredient.quantity}</>}
-                      {ingredient.unit && <> {ingredient.unit}</>}
-                    </li>
+                      {/* Titre préparation */}
+                      <div className="space-y-2">
+                        <h3 className="text-xl font-semibold">
+                          {preparation.title}
+                        </h3>
+
+                        {preparation.description && (
+                          <p className="text-muted-foreground text-sm">
+                            {preparation.description}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Ingrédients */}
+                      <section className="space-y-3">
+                        <h4 className="font-semibold">Ingrédients</h4>
+
+                        {preparation.ingredients.length > 0 ? (
+                          <ul className="space-y-2">
+                            {preparation.ingredients.map((ingredient) => (
+                              <li
+                                key={ingredient.id}
+                                className="bg-background/70 rounded-lg border p-3"
+                              >
+                                <span className="font-medium">
+                                  {ingredient.name}
+                                </span>
+
+                                {ingredient.quantity !== null &&
+                                  ingredient.quantity !== undefined && (
+                                    <> — {ingredient.quantity}</>
+                                  )}
+
+                                {ingredient.unit && <> {ingredient.unit}</>}
+
+                                {ingredient.note && (
+                                  <span className="text-muted-foreground ml-2 text-sm">
+                                    ({ingredient.note})
+                                  </span>
+                                )}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-muted-foreground text-sm">
+                            Aucun ingrédient renseigné.
+                          </p>
+                        )}
+                      </section>
+
+                      {/* Étapes */}
+                      <section className="space-y-3">
+                        <h4 className="font-semibold">Étapes</h4>
+
+                        {preparation.steps.length > 0 ? (
+                          <ol className="space-y-3">
+                            {preparation.steps.map((step, index) => (
+                              <li key={step.id} className="flex gap-3">
+                                <span className="bg-primary text-primary-foreground flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
+                                  {index + 1}
+                                </span>
+
+                                <p className="pt-1 text-sm leading-6">
+                                  {step.description}
+                                </p>
+                              </li>
+                            ))}
+                          </ol>
+                        ) : (
+                          <p className="text-muted-foreground text-sm">
+                            Aucune étape renseignée.
+                          </p>
+                        )}
+                      </section>
+                    </article>
                   ))}
-                </ul>
+                </div>
               ) : (
                 <p className="text-muted-foreground">
-                  Aucun ingrédient renseigné.
-                </p>
-              )}
-            </section>
-
-            <section className="space-y-4">
-              <h2 className="text-xl font-semibold">Préparation</h2>
-
-              {recipe.instructions ? (
-                <p className="text-sm leading-7 whitespace-pre-line">
-                  {recipe.instructions}
-                </p>
-              ) : (
-                <p className="text-muted-foreground">
-                  Aucune instruction renseignée.
+                  Aucune préparation renseignée.
                 </p>
               )}
             </section>

@@ -5,29 +5,20 @@ import { recipes } from '@/db/schema';
 
 /**
  * Récupère une recette complète
- * à partir de son slug.
+ * à partir de son identifiant.
  *
- * Structure :
+ * Les données récupérées comprennent :
  *
- * recette
- * ├── informations générales
- * └── préparations
- *      ├── ingrédients
- *      └── étapes
+ * - les informations générales ;
+ * - les préparations ;
+ * - les ingrédients de chaque préparation ;
+ * - les étapes de chaque préparation.
  */
-export async function getRecipeBySlug(slug: string) {
+export async function getRecipeById(recipeId: string) {
   return await db.query.recipes.findFirst({
-    where: eq(recipes.slug, slug),
+    where: eq(recipes.id, recipeId),
 
     with: {
-      author: {
-        columns: {
-          id: true,
-          username: true,
-          image: true,
-        },
-      },
-
       preparations: {
         orderBy: (preparations, { asc }) => [asc(preparations.position)],
 
