@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useRecipeEditor } from '@/providers/RecipeEditorProvider';
+import ImageUploader from '@/components/upload/ImageUploader';
 
 import type { RecipeDifficulty } from '@/types/recipe';
 
@@ -107,27 +108,17 @@ export default function InformationEditor() {
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="recipe-image" className="text-sm font-medium">
-            Image
-          </Label>
+        <div className="space-y-3">
+          <Label className="text-sm font-medium">Image</Label>
 
-          <Input
-            id="recipe-image"
-            type="url"
-            value={data.image ?? ''}
-            placeholder="https://..."
-            className="h-11 rounded-xl"
-            onChange={(event) =>
+          <ImageUploader
+            value={data.image}
+            onChange={(value) =>
               updateData({
-                image: event.target.value,
+                image: value,
               })
             }
           />
-
-          <p className="text-muted-foreground text-xs">
-            Pour le moment, indique l&apos;URL de l&apos;image.
-          </p>
         </div>
       </section>
 
